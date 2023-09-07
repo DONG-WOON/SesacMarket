@@ -7,7 +7,7 @@
 
 import UIKit
 
-@objc protocol UIConfigurable {
+@objc protocol UIConfigurable: AnyObject {
     func configureViews()
     @objc optional func setAttributes()
     func setConstraints()
