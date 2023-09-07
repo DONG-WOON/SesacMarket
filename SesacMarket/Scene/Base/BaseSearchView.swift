@@ -7,10 +7,23 @@
 
 import UIKit
 
-final class BaseSearchView: UIView, UIConfigurable {
+final class BaseSearchView: UIView, UIConfigurable, KeyboardLayoutProtocol {
+    
+    
+    weak var keyboardWillHideToken: NSObjectProtocol?
+    weak var keyboardWillShowToken: NSObjectProtocol?
     
     let searchBar = UISearchBar()
-    let tableView = UITableView()
+    
+    var keyboardHeight: CGFloat = 0 {
+        didSet {
+            collectionView.snp.remakeConstraints { make in
+                make.top.equalTo(searchBar.snp.bottom)
+                make.horizontalEdges.equalTo(safeAreaLayoutGuide)
+                make.bottom.equalTo(safeAreaLayoutGuide).inset(keyboardHeight)
+            }
+        }
+    }
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -18,7 +31,6 @@ final class BaseSearchView: UIView, UIConfigurable {
         configureViews()
         setAttributes()
         setConstraints()
-        
     }
     
     required init?(coder: NSCoder) {
@@ -27,19 +39,16 @@ final class BaseSearchView: UIView, UIConfigurable {
     
     func configureViews() {
         addSubview(searchBar)
-        addSubview(tableView)
     }
     
     func setAttributes() {
         searchBar.backgroundColor = .systemBackground
-        tableView.backgroundColor = .systemBackground
     }
     
     func setConstraints() {
         searchBar.snp.makeConstraints { make in
             make.top.horizontalEdges.equalTo(safeAreaLayoutGuide)
         }
-        tableView.snp.makeConstraints { make in
             make.top.equalTo(searchBar.snp.bottom)
             make.horizontalEdges.equalTo(safeAreaLayoutGuide)
             if #available(iOS 15.0, *) {
