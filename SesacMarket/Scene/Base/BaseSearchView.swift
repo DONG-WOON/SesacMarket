@@ -9,11 +9,14 @@ import UIKit
 
 final class BaseSearchView: UIView, UIConfigurable, KeyboardLayoutProtocol {
     
+    weak var collectionViewDataSource: UICollectionViewDataSource?
+    weak var collectionViewDelegate: UICollectionViewDelegate?
     
     weak var keyboardWillHideToken: NSObjectProtocol?
     weak var keyboardWillShowToken: NSObjectProtocol?
     
     let searchBar = UISearchBar()
+    let collectionView = UICollectionView(frame: .zero, collectionViewLayout: BaseCompositionalLayout())
     
     var keyboardHeight: CGFloat = 0 {
         didSet {
@@ -24,6 +27,7 @@ final class BaseSearchView: UIView, UIConfigurable, KeyboardLayoutProtocol {
             }
         }
     }
+    
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -39,16 +43,23 @@ final class BaseSearchView: UIView, UIConfigurable, KeyboardLayoutProtocol {
     
     func configureViews() {
         addSubview(searchBar)
+        addSubview(collectionView)
     }
     
     func setAttributes() {
         searchBar.backgroundColor = .systemBackground
+        searchBar.showsCancelButton = true
+        
+        collectionView.backgroundColor = .systemBackground
+        collectionView.register(BaseItemCell.self, forCellWithReuseIdentifier: BaseItemCell.identifier)
     }
     
     func setConstraints() {
         searchBar.snp.makeConstraints { make in
             make.top.horizontalEdges.equalTo(safeAreaLayoutGuide)
         }
+        
+        collectionView.snp.makeConstraints { make in
             make.top.equalTo(searchBar.snp.bottom)
             make.horizontalEdges.equalTo(safeAreaLayoutGuide)
             if #available(iOS 15.0, *) {
