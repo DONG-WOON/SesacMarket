@@ -9,7 +9,7 @@ import Foundation
 import Moya
 
 struct APIManager {
-    private let provider = MoyaProvider<Service>()
+    private let provider = MoyaProvider<NetworkService>()
     static let shared = APIManager()
     
     private init() { }

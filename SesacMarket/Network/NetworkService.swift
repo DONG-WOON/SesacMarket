@@ -1,5 +1,5 @@
 //
-//  Service.swift
+//  NetworkService.swift
 //  SesacMarket
 //
 //  Created by 서동운 on 9/7/23.
@@ -8,11 +8,11 @@
 import Foundation
 import Moya
 
-enum Service {
+enum NetworkService {
     case search(query: String, size: Int, page: Int, sort: Sort)
 }
 
-extension Service: TargetType {
+extension NetworkService: TargetType {
     var baseURL: URL {
         return URL(string: "https://openapi.naver.com/v1")!
     }
