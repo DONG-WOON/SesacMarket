@@ -14,18 +14,18 @@ struct APIManager {
     
     private init() { }
     
-    func request(search: String, size: Int = 30, page: Int, sort: Sort) {
+    func request(search: String, size: Int = 30, page: Int, sort: Sort, onSuccess: @escaping ([Item]) -> Void, onFailure: @escaping (Error) -> Void) {
         provider.request(.search(query: search, size: size, page: page, sort: sort)) { result in
             switch result {
             case .success(let response):
                 do {
                     let data = try response.map(Response.self)
-                    dump(data)
+                    return onSuccess(data.items)
                 } catch {
-                    print(error)
+                    return onFailure(error)
                 }
             case .failure(let error):
-                print(error)
+                return onFailure(error)
             }
         }
     }
