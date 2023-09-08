@@ -29,6 +29,7 @@ final class SearchViewController: BaseViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        mainView.searchBar.delegate = self
         mainView.collectionView.delegate = self
         mainView.collectionView.dataSource = self
         mainView.collectionView.prefetchDataSource = self
@@ -36,6 +37,27 @@ final class SearchViewController: BaseViewController {
         viewModel.getItem(search: "캠핑카") {
             self.mainView.collectionView.reloadData()
         }
+    }
+}
+
+// MARK: SearchBar Delegate
+
+extension SearchViewController: UISearchBarDelegate {
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        
+        // ⭐️ TO DO: 텍스트 validate ⭐️
+        viewModel.items.removeAll()
+        viewModel.getItem(search: searchBar.text!) {
+            // 노티나 다른걸로 전달하기
+            self.mainView.collectionView.scrollToItem(at: IndexPath(item: 0, section: 0), at: .bottom, animated: false)
+            self.mainView.collectionView.reloadData()
+        }
+    }
+    
+    func searchBarShouldEndEditing(_ searchBar: UISearchBar) -> Bool {
+        searchBar.resignFirstResponder()
+        
+        return true
     }
 }
 
@@ -49,6 +71,11 @@ extension SearchViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: BaseItemCell.identifier, for: indexPath) as? BaseItemCell else { return UICollectionViewCell() }
         cell.update(item: viewModel.items[indexPath.item])
+        cell.wishButtonAction = { [weak self] in
+            self?.viewModel.items[indexPath.row].isWished.toggle()
+            collectionView.reloadItems(at: [indexPath])
+        }
+        
         return cell
     }
 }
@@ -56,8 +83,12 @@ extension SearchViewController: UICollectionViewDataSource {
 extension SearchViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         // ⭐️ TO DO: 웹뷰 ⭐️
+        
+        print("🔥 ")
     }
 }
+
+// MARK: Prefetch
 
 extension SearchViewController: UICollectionViewDataSourcePrefetching {
     func collectionView(_ collectionView: UICollectionView, prefetchItemsAt indexPaths: [IndexPath]) {

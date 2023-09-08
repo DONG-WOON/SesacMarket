@@ -10,6 +10,8 @@ import Kingfisher
 
 class BaseItemCell: UICollectionViewCell, UIConfigurable {
     
+    var wishButtonAction: (() -> Void)?
+    
     let itemImageView = UIImageView()
     let mallNameLabel = UILabel()
     let titleLabel = UILabel()
@@ -33,6 +35,10 @@ class BaseItemCell: UICollectionViewCell, UIConfigurable {
         
     }
     
+    @objc func wishButtonDidTapped() {
+        wishButtonAction?()
+    }
+    
     func configureViews() {
         
         contentView.addSubview(itemImageView)
@@ -41,6 +47,7 @@ class BaseItemCell: UICollectionViewCell, UIConfigurable {
         contentView.addSubview(priceLabel)
         
         itemImageView.addSubview(wishButton)
+        contentView.addSubview(wishButton)
     }
     
     func setAttributes() {
@@ -68,8 +75,10 @@ class BaseItemCell: UICollectionViewCell, UIConfigurable {
         priceLabel.adjustsFontForContentSizeCategory = true
         
         wishButton.setImage(UIImage(systemName: Image.wish), for: .normal)
+
         wishButton.tintColor = .black
         wishButton.backgroundColor = .white
+        wishButton.addTarget(self, action: #selector(wishButtonDidTapped), for: .touchUpInside)
     }
     
     override func layoutSubviews() {
@@ -121,5 +130,7 @@ extension BaseItemCell {
         titleLabel.text = item.validatedTitle
         priceLabel.text = item.price
         itemImageView.kf.setImage(with: item.thumbnailURL)
+        wishButton.setImage(UIImage(systemName: !item.isWished ? Image.wish : Image.wishFill), for: .normal)
+        itemImageView.kf.setImage(with: item.originalImageURL)
     }
 }
