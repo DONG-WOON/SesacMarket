@@ -27,6 +27,11 @@ struct Item: Codable {
         return validate(text: title)
     }
     
+    var decimalPrice: String {
+        guard let price = NumberFormatter.DecimalFormatter.string(from: NSNumber(floatLiteral: Double(price) ?? 0)) else { return "가격정보 없음" }
+        return price + "원"
+    }
+    
     enum CodingKeys: String, CodingKey {
         case title
         case stringURL = "image"
@@ -34,6 +39,17 @@ struct Item: Codable {
         case mallName
         case productID = "productId"
         case maker
+    }
+    
+    init(entity: WishItemEntity) {
+        
+        self.title = entity.title
+        self.stringURL = entity.stringURL
+        self.price = entity.price
+        self.mallName = entity.mallName
+        self.productID = entity.productID
+        self.maker = entity.maker
+        self.isWished = entity.isWished
     }
 }
 
