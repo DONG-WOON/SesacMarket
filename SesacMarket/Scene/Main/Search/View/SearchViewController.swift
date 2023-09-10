@@ -14,7 +14,7 @@ final class SearchViewController: BaseViewController {
     
     init(viewModel: SearchViewModel) {
         self.viewModel = viewModel
-
+        
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -29,14 +29,14 @@ final class SearchViewController: BaseViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+    override func configureViews() {
         mainView.searchBar.delegate = self
+        
         mainView.collectionView.delegate = self
         mainView.collectionView.dataSource = self
         mainView.collectionView.prefetchDataSource = self
-        
-        viewModel.getItem(search: "캠핑카") {
-            self.mainView.collectionView.reloadData()
-        }
+        mainView.collectionView.register(SearchItemCell.self, forCellWithReuseIdentifier: SearchItemCell.identifier)
+        mainView.collectionView.register(BaseButtonsView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: BaseButtonsView.identifier)
     }
 }
 
@@ -47,10 +47,11 @@ extension SearchViewController: UISearchBarDelegate {
         
         // ⭐️ TO DO: 텍스트 validate ⭐️
         viewModel.items.removeAll()
+        
         viewModel.getItem(search: searchBar.text!) {
             // 노티나 다른걸로 전달하기
-            self.mainView.collectionView.scrollToItem(at: IndexPath(item: 0, section: 0), at: .bottom, animated: false)
             self.mainView.collectionView.reloadData()
+            
         }
     }
     
@@ -64,6 +65,12 @@ extension SearchViewController: UISearchBarDelegate {
 // MARK: CollectionView
 
 extension SearchViewController: UICollectionViewDataSource {
+   
+    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+        let headerView = collectionView.dequeueReusableSupplementaryView(ofKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: BaseButtonsView.identifier, for: indexPath)
+        return headerView
+    }
+    
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return viewModel.items.count
     }
