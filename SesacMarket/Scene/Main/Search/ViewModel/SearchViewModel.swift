@@ -7,7 +7,10 @@
 
 import Foundation
 
-class SearchViewModel {
+final class SearchViewModel {
+    let repository = WishItemEntityRepository()
+
+    
     var items: [Item] = []
     var page = 1
     var sort: Sort = .sim
@@ -21,4 +24,23 @@ class SearchViewModel {
             print(error)
         }
     }
+    
+    func addWish(_ item: Item) throws {
+        try repository.createItem(WishItemEntity(domain: item))
+    }
+    
+    func removeWish(_ item: Item) {
+        guard let wishItemEntity = repository.fetchFilter(item).first else { return }
+        repository.deleteItem(wishItemEntity)
+    }
+    
+    func checkWishItem(indexPath: IndexPath) {
+        let item = items[indexPath.item]
+        if repository.wishItemEntities.contains(where: { $0.productID == item.productID }) {
+            items[indexPath.item].isWished = true
+        } else {
+            items[indexPath.item].isWished = false
+        }
+    }
+    
 }
