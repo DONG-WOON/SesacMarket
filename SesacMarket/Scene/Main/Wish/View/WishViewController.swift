@@ -10,7 +10,7 @@ import UIKit
 final class WishViewController: BaseViewController {
     
     let viewModel: WishViewModel
-    let mainView = BaseSearchView()
+    let mainView = BaseView(scene: .wish)
     
     init(viewModel: WishViewModel) {
         self.viewModel = viewModel

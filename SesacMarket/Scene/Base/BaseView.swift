@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class BaseSearchView: UIView, UIConfigurable, KeyboardLayoutProtocol {
+final class BaseView: UIView, UIConfigurable, KeyboardLayoutProtocol {
     
     weak var collectionViewDataSource: UICollectionViewDataSource?
     weak var collectionViewDelegate: UICollectionViewDelegate?
@@ -16,7 +16,7 @@ final class BaseSearchView: UIView, UIConfigurable, KeyboardLayoutProtocol {
     weak var keyboardWillShowToken: NSObjectProtocol?
     
     let searchBar = UISearchBar()
-    let collectionView = UICollectionView(frame: .zero, collectionViewLayout: BaseCompositionalLayout.createLayout())
+    let collectionView: UICollectionView
     
     var keyboardHeight: CGFloat = 0 {
         didSet {
@@ -24,9 +24,10 @@ final class BaseSearchView: UIView, UIConfigurable, KeyboardLayoutProtocol {
         }
     }
     
-    
-    override init(frame: CGRect) {
-        super.init(frame: frame)
+    init(scene: Scene) {
+        collectionView = UICollectionView(frame: .zero, collectionViewLayout: BaseCompositionalLayout.createLayout(scene: scene))
+        
+        super.init(frame: .zero)
         
         configureViews()
         setAttributes()

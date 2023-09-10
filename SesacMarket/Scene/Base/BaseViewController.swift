@@ -18,15 +18,11 @@ class BaseViewController: UIViewController, UIConfigurable {
         setConstraints()
     }
     
-    func configureViews() {
-        
-    }
+    func configureViews() { }
     
     func setAttributes() {
         view.backgroundColor = .systemBackground
     }
     
-    func setConstraints() {
-        
-    }
+    func setConstraints() { }
 }

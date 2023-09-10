@@ -10,7 +10,7 @@ import UIKit
 final class SearchViewController: BaseViewController {
     
     let viewModel: SearchViewModel
-    let mainView = BaseSearchView()
+    let mainView = BaseView(scene: .search)
     
     var prefetchingIndexPaths: [IndexPath: Cancelable] = [:]
     

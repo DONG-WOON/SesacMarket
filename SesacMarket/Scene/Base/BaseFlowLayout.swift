@@ -9,7 +9,7 @@ import UIKit
 
 final class BaseCompositionalLayout: UICollectionViewCompositionalLayout {
     
-    static func createLayout() -> UICollectionViewCompositionalLayout {
+    static func createLayout(scene: Scene) -> UICollectionViewCompositionalLayout {
         return UICollectionViewCompositionalLayout { sectionIndex, environment in
             
             var columnCount = 2
@@ -36,12 +36,14 @@ final class BaseCompositionalLayout: UICollectionViewCompositionalLayout {
             group.interItemSpacing = .fixed(spacing)
             
             let section = NSCollectionLayoutSection(group: group)
-            let supplementaryItemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1),
-                                                               heightDimension: .estimated(50))
-            let header = NSCollectionLayoutBoundarySupplementaryItem(layoutSize: supplementaryItemSize, elementKind: UICollectionView.elementKindSectionHeader, alignment: .top)
             
-            section.boundarySupplementaryItems = [header]
-            
+            if scene == .search {
+                let supplementaryItemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1),
+                                                                   heightDimension: .estimated(50))
+                let header = NSCollectionLayoutBoundarySupplementaryItem(layoutSize: supplementaryItemSize, elementKind: UICollectionView.elementKindSectionHeader, alignment: .top)
+                
+                section.boundarySupplementaryItems = [header]
+            }
             section.contentInsets = edgeInset
             
             return section
