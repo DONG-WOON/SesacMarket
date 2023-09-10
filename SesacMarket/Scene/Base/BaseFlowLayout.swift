@@ -9,26 +9,54 @@ import UIKit
 
 final class BaseCompositionalLayout: UICollectionViewCompositionalLayout {
     
-    init() {
-        let inset = 5.0
-        let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1 / 2),
-                                              heightDimension: .fractionalHeight(1.0))
-        let item = NSCollectionLayoutItem(layoutSize: itemSize)
-        item.contentInsets = NSDirectionalEdgeInsets(top: inset, leading: inset, bottom: inset, trailing: inset)
-
-        // ⭐️ TO DO: 다이나믹 사이즈 이슈 ⭐️
-        let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
-                                               heightDimension: .estimated(300))
-        let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
-        
-        let section = NSCollectionLayoutSection(group: group)
-        section.contentInsets = NSDirectionalEdgeInsets(top: inset, leading: inset, bottom: inset, trailing: inset)
-
-        super.init(section: section)
+    static func createLayout() -> UICollectionViewCompositionalLayout {
+        return UICollectionViewCompositionalLayout { sectionIndex, environment in
+            
+            var columnCount = 2
+            
+            switch environment.container.effectiveContentSize.width {
+            case ..<500: // 아이폰 세로
+                columnCount = 2
+            case ..<1000: // 아이폰 가로, 아이패드 세로
+                columnCount = 3
+            default: // 아이패드 가로
+                columnCount = 4
+            }
+            
+            let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
+                                                  heightDimension: .fractionalHeight(1.0))
+            
+            let item = NSCollectionLayoutItem(layoutSize: itemSize)
+            let spacing = 10.0
+            let edgeInset = NSDirectionalEdgeInsets(top: spacing, leading: spacing, bottom: spacing, trailing: spacing)
+            
+            let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
+                                                   heightDimension: .fractionalWidth(1.4 / CGFloat(columnCount)))
+            let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitem: item, count: columnCount)
+            group.interItemSpacing = .fixed(spacing)
+            
+            let section = NSCollectionLayoutSection(group: group)
+            let supplementaryItemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1),
+                                                               heightDimension: .estimated(50))
+            let header = NSCollectionLayoutBoundarySupplementaryItem(layoutSize: supplementaryItemSize, elementKind: UICollectionView.elementKindSectionHeader, alignment: .top)
+            
+            section.boundarySupplementaryItems = [header]
+            
+            section.contentInsets = edgeInset
+            
+            return section
+        }
     }
     
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+    private func getColumn(for environment: NSCollectionLayoutEnvironment) {
+        print(environment.traitCollection.horizontalSizeClass.rawValue, environment.traitCollection.verticalSizeClass.rawValue)
+        
+        //            switch environment.traitCollection.userInterfaceIdiom {
+        //            case .phone:
+        //            case .pad:
+        //            default:
+        //                return 1
+        //            }
+        
     }
 }
-

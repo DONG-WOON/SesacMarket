@@ -16,15 +16,11 @@ final class BaseSearchView: UIView, UIConfigurable, KeyboardLayoutProtocol {
     weak var keyboardWillShowToken: NSObjectProtocol?
     
     let searchBar = UISearchBar()
-    let collectionView = UICollectionView(frame: .zero, collectionViewLayout: BaseCompositionalLayout())
+    let collectionView = UICollectionView(frame: .zero, collectionViewLayout: BaseCompositionalLayout.createLayout())
     
     var keyboardHeight: CGFloat = 0 {
         didSet {
-            collectionView.snp.remakeConstraints { make in
-                make.top.equalTo(searchBar.snp.bottom)
-                make.horizontalEdges.equalTo(safeAreaLayoutGuide)
-                make.bottom.equalTo(safeAreaLayoutGuide).inset(keyboardHeight)
-            }
+            setCollectionViewConstraints(constant: keyboardHeight)
         }
     }
     
@@ -52,7 +48,6 @@ final class BaseSearchView: UIView, UIConfigurable, KeyboardLayoutProtocol {
         searchBar.showsCancelButton = true
         
         collectionView.backgroundColor = .systemBackground
-        collectionView.register(BaseItemCell.self, forCellWithReuseIdentifier: BaseItemCell.identifier)
     }
     
     func setConstraints() {
@@ -60,13 +55,17 @@ final class BaseSearchView: UIView, UIConfigurable, KeyboardLayoutProtocol {
             make.top.horizontalEdges.equalTo(safeAreaLayoutGuide)
         }
         
-        collectionView.snp.makeConstraints { make in
+        setCollectionViewConstraints(constant: keyboardHeight)
+    }
+    
+    fileprivate func setCollectionViewConstraints(constant: CGFloat) {
+        collectionView.snp.remakeConstraints { make in
             make.top.equalTo(searchBar.snp.bottom)
             make.horizontalEdges.equalTo(safeAreaLayoutGuide)
+            
             if #available(iOS 15.0, *) {
                 make.bottom.equalTo(keyboardLayoutGuide.snp.top)
             } else {
-                make.bottom.equalTo(safeAreaLayoutGuide)
             }
         }
     }
