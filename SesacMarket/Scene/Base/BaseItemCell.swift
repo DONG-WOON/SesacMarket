@@ -32,7 +32,10 @@ class BaseItemCell: UICollectionViewCell, UIConfigurable {
     }
     
     override func prepareForReuse() {
-        
+        itemImageView.image = nil
+        mallNameLabel.text = nil
+        titleLabel.text = nil
+        priceLabel.text = nil
     }
     
     @objc func wishButtonDidTapped() {
@@ -46,7 +49,6 @@ class BaseItemCell: UICollectionViewCell, UIConfigurable {
         contentView.addSubview(titleLabel)
         contentView.addSubview(priceLabel)
         
-        itemImageView.addSubview(wishButton)
         contentView.addSubview(wishButton)
     }
     
@@ -59,7 +61,6 @@ class BaseItemCell: UICollectionViewCell, UIConfigurable {
         mallNameLabel.lineBreakMode = .byTruncatingMiddle
         mallNameLabel.textAlignment = .left
         mallNameLabel.numberOfLines = 1
-        mallNameLabel.adjustsFontForContentSizeCategory = true
     
         titleLabel.font = .systemFont(ofSize: 13)
         titleLabel.textColor = .label
@@ -73,8 +74,6 @@ class BaseItemCell: UICollectionViewCell, UIConfigurable {
         priceLabel.textAlignment = .left
         priceLabel.numberOfLines = 1
         priceLabel.adjustsFontForContentSizeCategory = true
-        
-        wishButton.setImage(UIImage(systemName: Image.wish), for: .normal)
 
         wishButton.tintColor = .black
         wishButton.backgroundColor = .white
@@ -90,26 +89,24 @@ class BaseItemCell: UICollectionViewCell, UIConfigurable {
     
     // ⭐️ TO DO: landscape 모드 대응 ⭐️
     func setConstraints() {
+    
         itemImageView.snp.makeConstraints { make in
             make.top.horizontalEdges.equalToSuperview()
             make.height.equalTo(itemImageView.snp.width)
         }
-        
-        mallNameLabel.setContentHuggingPriority(.required, for: .vertical)
+    
         mallNameLabel.snp.makeConstraints { make in
             make.leading.equalToSuperview().inset(5)
             make.trailing.equalToSuperview().inset(5)
             make.top.equalTo(itemImageView.snp.bottom).offset(3)
         }
-        
-        titleLabel.setContentHuggingPriority(.required, for: .vertical)
+
         titleLabel.snp.makeConstraints { make in
             make.leading.equalToSuperview().inset(5)
             make.trailing.equalToSuperview().inset(5)
             make.top.equalTo(mallNameLabel.snp.bottom).offset(3)
         }
-        
-        priceLabel.setContentHuggingPriority(.required, for: .vertical)
+
         priceLabel.snp.makeConstraints { make in
             make.leading.equalToSuperview().inset(5)
             make.trailing.equalToSuperview().inset(5)
@@ -121,16 +118,5 @@ class BaseItemCell: UICollectionViewCell, UIConfigurable {
             make.height.width.equalTo(itemImageView.snp.width).multipliedBy(0.2)
             make.trailing.bottom.equalTo(itemImageView).inset(5)
         }
-    }
-}
-
-extension BaseItemCell {
-    func update(item: Item) {
-        mallNameLabel.text = item.mallName
-        titleLabel.text = item.validatedTitle
-        priceLabel.text = item.price
-        itemImageView.kf.setImage(with: item.thumbnailURL)
-        wishButton.setImage(UIImage(systemName: !item.isWished ? Image.wish : Image.wishFill), for: .normal)
-        itemImageView.kf.setImage(with: item.originalImageURL)
     }
 }

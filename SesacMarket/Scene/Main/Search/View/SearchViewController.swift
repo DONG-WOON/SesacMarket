@@ -76,16 +76,46 @@ extension SearchViewController: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: BaseItemCell.identifier, for: indexPath) as? BaseItemCell else { return UICollectionViewCell() }
+        
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: SearchItemCell.identifier, for: indexPath) as? SearchItemCell else { return UICollectionViewCell() }
+        let item = viewModel.items[indexPath.item]
+        // ⭐️ TO DO: 필터 기능으로 변경하기 ⭐️
+        //        print(indexPath, "cellForRowAt")
+        if viewModel.repository.fetchFilter(item).count != 0 {
+            viewModel.items[indexPath.item].isWished = true
+        }
+        
         cell.update(item: viewModel.items[indexPath.item])
         cell.wishButtonAction = { [weak self] in
-            self?.viewModel.items[indexPath.row].isWished.toggle()
+            guard let self else { return }
+            self.viewModel.items[indexPath.item].isWished.toggle()
+            // 다르게 구현
+            if self.viewModel.items[indexPath.item].isWished {
+                do {
+                    try self.viewModel.addWish(viewModel.items[indexPath.item])
+                } catch {
+                    print("관심 추가 에러")
+                }
+            } else {
+                self.viewModel.removeWish(item)
+            }
             collectionView.reloadItems(at: [indexPath])
         }
         
         return cell
     }
+    
+    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+//        viewModel.checkWishItem(indexPath: indexPath)
+        
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+//        viewModel.checkWishItem(indexPath: indexPath)
+    }
+    
 }
+
 
 extension SearchViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {

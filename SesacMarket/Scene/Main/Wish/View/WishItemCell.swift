@@ -1,22 +1,22 @@
 //
-//  SearchItemCell.swift
+//  WishItemCell.swift
 //  SesacMarket
 //
 //  Created by 서동운 on 9/8/23.
 //
 
 import UIKit
-// ⭐️ TO DO: 업데이트를 프로토콜로 해보자 ⭐️
-final class SearchItemCell: BaseItemCell {
+
+final class WishItemCell: BaseItemCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
     }
-
-    func update(item: Item) {
+    
+    func update(item: WishItemEntity) {
         mallNameLabel.text = item.mallName
-        titleLabel.text = item.validatedTitle
-        priceLabel.text = item.decimalPrice
+        titleLabel.text = item.title
+        priceLabel.text = item.price
         wishButton.setImage(UIImage(systemName: !item.isWished ? Image.wish : Image.wishFill), for: .normal)
         itemImageView.kf.setImage(with: item.originalImageURL)
     }
