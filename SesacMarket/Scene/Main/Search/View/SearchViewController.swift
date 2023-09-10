@@ -12,6 +12,8 @@ final class SearchViewController: BaseViewController {
     let viewModel: SearchViewModel
     let mainView = BaseSearchView()
     
+    var prefetchingIndexPaths: [IndexPath: Cancelable] = [:]
+    
     init(viewModel: SearchViewModel) {
         self.viewModel = viewModel
         
@@ -29,6 +31,20 @@ final class SearchViewController: BaseViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        configureViews()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        if !viewModel.items.isEmpty {
+            mainView.collectionView.indexPathsForVisibleItems.forEach { indexPath in
+                viewModel.checkWishItem(indexPath: indexPath)
+                mainView.collectionView.reloadItems(at: [indexPath])
+            }
+        }
+    }
+    
     override func configureViews() {
         mainView.searchBar.delegate = self
         
@@ -86,6 +102,7 @@ extension SearchViewController: UICollectionViewDataSource {
         }
         
         cell.update(item: viewModel.items[indexPath.item])
+        
         cell.wishButtonAction = { [weak self] in
             guard let self else { return }
             self.viewModel.items[indexPath.item].isWished.toggle()
@@ -133,11 +150,34 @@ extension SearchViewController: UICollectionViewDataSourcePrefetching {
             viewModel.page += 1
             viewModel.getItem(search: "캠핑카") {
                 collectionView.reloadData()
+        for indexPath in indexPaths {
+
+//            viewModel.checkWishItem(indexPath: indexPath)
+//
+//            if indexPath.item == viewModel.items.count - 15 {
+//                viewModel.page += 1
+//
+//                let searchText = mainView.searchBar.text!
+//                prefetchingIndexPaths[indexPath] = viewModel.getItem(search: searchText) {
+//                    collectionView.reloadData()
+//                }
+//                print(indexPath, "prefetch 지금")
+//            }
+        }
+        
+        
+    }
+    
             }
         }
 
     }
+
     func collectionView(_ collectionView: UICollectionView, cancelPrefetchingForItemsAt indexPaths: [IndexPath]) {
         return
+        for indexPath in indexPaths {
+            prefetchingIndexPaths[indexPath]?.cancel()
+            print(indexPath, "cancel")
+        }
     }
 }

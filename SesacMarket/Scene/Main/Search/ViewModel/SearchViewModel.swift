@@ -15,9 +15,11 @@ final class SearchViewModel {
     var page = 1
     var sort: Sort = .sim
     
-    func getItem(search: String, completion: @escaping () -> Void) {
-        APIManager.shared.request(search: search, page: page, sort: sort)
-        { items in
+    @discardableResult
+    func getItem(search: String, completion: @escaping () -> Void) -> Cancelable {
+        return APIManager.shared.request(search: search, page: page, sort: sort)
+        { [weak self] items in
+            guard let self else { return }
             self.items.append(contentsOf: items)
             completion()
         } onFailure: { error in
