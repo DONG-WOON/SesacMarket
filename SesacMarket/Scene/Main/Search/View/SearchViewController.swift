@@ -146,10 +146,6 @@ extension SearchViewController: UICollectionViewDelegate {
 
 extension SearchViewController: UICollectionViewDataSourcePrefetching {
     func collectionView(_ collectionView: UICollectionView, prefetchItemsAt indexPaths: [IndexPath]) {
-        if indexPaths.contains(where: { $0.item == viewModel.items.count - 1 }) {
-            viewModel.page += 1
-            viewModel.getItem(search: "캠핑카") {
-                collectionView.reloadData()
         for indexPath in indexPaths {
 
 //            viewModel.checkWishItem(indexPath: indexPath)
@@ -170,11 +166,9 @@ extension SearchViewController: UICollectionViewDataSourcePrefetching {
     
             }
         }
-
     }
 
     func collectionView(_ collectionView: UICollectionView, cancelPrefetchingForItemsAt indexPaths: [IndexPath]) {
-        return
         for indexPath in indexPaths {
             prefetchingIndexPaths[indexPath]?.cancel()
             print(indexPath, "cancel")

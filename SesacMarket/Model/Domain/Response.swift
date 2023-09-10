@@ -14,7 +14,7 @@ struct Response: Codable {
 }
 
 // MARK: - Sort
-enum Sort: String {
+enum Sort: String, CaseIterable {
     case sim
     case date
     case asc

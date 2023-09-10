@@ -66,6 +66,7 @@ final class BaseSearchView: UIView, UIConfigurable, KeyboardLayoutProtocol {
             if #available(iOS 15.0, *) {
                 make.bottom.equalTo(keyboardLayoutGuide.snp.top)
             } else {
+                make.bottom.equalTo(safeAreaLayoutGuide).inset(keyboardHeight)
             }
         }
     }

@@ -15,12 +15,10 @@ struct Item: Codable {
     let mallName: String
     let productID: String
     let maker: String
+    var isWished: Bool = false
     
     var originalImageURL: URL? {
         return URL(string: stringURL)
-    }
-    var thumbnailURL: URL? {
-        return URL(string: stringURL + "?type=m510")
     }
     
     var validatedTitle: String {
