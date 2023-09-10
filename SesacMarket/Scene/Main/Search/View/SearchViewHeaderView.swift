@@ -7,7 +7,7 @@
 
 import UIKit
 
-class BaseButtonsView: UICollectionReusableView, UIConfigurable {
+class SearchViewHeaderView: UICollectionReusableView, UIConfigurable {
 
     lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout())
 
@@ -24,7 +24,7 @@ class BaseButtonsView: UICollectionReusableView, UIConfigurable {
 
     func configureViews() {
         collectionView.dataSource = self
-        collectionView.register(BaseButtonsViewCell.self, forCellWithReuseIdentifier: BaseButtonsViewCell.identifier)
+        collectionView.register(SearchViewHeaderViewCell.self, forCellWithReuseIdentifier: SearchViewHeaderViewCell.identifier)
         
         addSubview(collectionView)
     }
@@ -36,19 +36,19 @@ class BaseButtonsView: UICollectionReusableView, UIConfigurable {
     }
 }
 
-extension BaseButtonsView: UICollectionViewDataSource {
+extension SearchViewHeaderView: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return Sort.allCases.count
     }
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: BaseButtonsViewCell.identifier, for: indexPath) as? BaseButtonsViewCell else { return UICollectionViewCell() }
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: SearchViewHeaderViewCell.identifier, for: indexPath) as? SearchViewHeaderViewCell else { return UICollectionViewCell() }
         cell.update(title: Sort.allCases[indexPath.row].title)
         return cell
     }
 }
 
-extension BaseButtonsView {
+extension SearchViewHeaderView {
     func layout() -> UICollectionViewCompositionalLayout {
 
         let itemSize = NSCollectionLayoutSize(widthDimension: .estimated(20),

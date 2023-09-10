@@ -52,7 +52,7 @@ final class SearchViewController: BaseViewController {
         mainView.collectionView.dataSource = self
         mainView.collectionView.prefetchDataSource = self
         mainView.collectionView.register(SearchItemCell.self, forCellWithReuseIdentifier: SearchItemCell.identifier)
-        mainView.collectionView.register(BaseButtonsView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: BaseButtonsView.identifier)
+        mainView.collectionView.register(SearchViewHeaderView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: SearchViewHeaderView.identifier)
     }
 }
 

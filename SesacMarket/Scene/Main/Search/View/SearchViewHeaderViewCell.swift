@@ -1,5 +1,5 @@
 //
-//  BaseButtonsViewCell.swift
+//  SearchViewHeaderViewCell.swift
 //  SesacMarket
 //
 //  Created by 서동운 on 9/10/23.
@@ -7,7 +7,7 @@
 
 import UIKit
 
-class BaseButtonsViewCell: UICollectionViewCell, UIConfigurable {
+class SearchViewHeaderViewCell: UICollectionViewCell, UIConfigurable {
     
     override var isSelected: Bool {
         didSet {
