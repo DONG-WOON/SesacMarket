@@ -66,8 +66,7 @@ class BaseItemCell: UICollectionViewCell, UIConfigurable {
         titleLabel.textAlignment = .left
         titleLabel.numberOfLines = 2
         titleLabel.adjustsFontForContentSizeCategory = true
-        
-        // ⭐️ TO DO: 가격의 경우 큰 수의 경우 어떻게 보여줄지 ⭐️
+
         priceLabel.font = .boldSystemFont(ofSize: 15)
         priceLabel.textColor = .label
         priceLabel.textAlignment = .left
@@ -86,7 +85,6 @@ class BaseItemCell: UICollectionViewCell, UIConfigurable {
         wishButton.rounded(radius: wishButton.bounds.width / 2)
     }
     
-    // ⭐️ TO DO: landscape 모드 대응 ⭐️
     func setConstraints() {
     
         itemImageView.snp.makeConstraints { make in

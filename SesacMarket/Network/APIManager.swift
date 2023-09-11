@@ -41,6 +41,4 @@ struct APIManager {
             }
         }
     }
-    
-    // ⭐️ TO DO: 에러대응 ⭐️
 }

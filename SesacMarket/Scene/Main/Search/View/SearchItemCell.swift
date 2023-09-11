@@ -6,7 +6,7 @@
 //
 
 import UIKit
-// ⭐️ TO DO: 업데이트를 프로토콜로 해보자 ⭐️
+
 final class SearchItemCell: BaseItemCell {
     
     override func prepareForReuse() {

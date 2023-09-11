@@ -9,8 +9,7 @@ import Foundation
 import Combine
 
 final class SearchViewModel: ValidateTextProtocol {
-    // ⭐️ TO DO: usecase추가  ⭐️
-    
+   
     var items: [Item] = []
     var page = 1
     var sort: Sort = .sim
@@ -20,7 +19,7 @@ final class SearchViewModel: ValidateTextProtocol {
     var prefetchingIndexPaths: [IndexPath: Cancelable?] = [:]
     
     @discardableResult
-    // ⭐️ TO DO: 검색어를 중간에 지울경우 이슈 생김 ⭐️
+
     func fetchItem(completion: @escaping () -> Void, onFailure: @escaping (SesacError) -> Void) -> Cancelable? {
         let result = validate(text: searchString)
         switch result {
