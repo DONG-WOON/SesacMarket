@@ -18,6 +18,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         
         Realm.Configuration.defaultConfiguration = realmConfiguration
+        
+        let navigationBarAppearance = UINavigationBar.appearance()
+        navigationBarAppearance.tintColor = .label
         return true
     }
 

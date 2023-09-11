@@ -40,6 +40,7 @@ final class WishViewController: BaseViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         // ⭐️ TO DO: 매번 요청하는 것 바꾸는것 고려. ⭐️
+        
         viewModel.fetchWish() {
             mainView.collectionView.reloadData()
         }
@@ -88,9 +89,9 @@ extension WishViewController: UICollectionViewDataSource {
 
 extension WishViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        // ⭐️ TO DO: 웹뷰 ⭐️
-        
-        print("🔥 ")
+        let item = viewModel.wishItems[indexPath.item]
+        let vc = DetailViewController(item: item)
+        navigationController?.pushViewController(vc, animated: true)
     }
 }
 

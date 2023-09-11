@@ -122,9 +122,9 @@ extension SearchViewController: UICollectionViewDataSource {
 
 extension SearchViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        // ⭐️ TO DO: 웹뷰 ⭐️
-        
-        print("🔥")
+        let item = viewModel.items[indexPath.item]
+        let vc = DetailViewController(item: item)
+        navigationController?.pushViewController(vc, animated: true)
     }
 }
 
