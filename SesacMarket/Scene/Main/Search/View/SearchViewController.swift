@@ -67,7 +67,6 @@ extension SearchViewController: UISearchBarDelegate {
         viewModel.getItem(search: searchBar.text!) {
             // 노티나 다른걸로 전달하기
             self.mainView.collectionView.reloadData()
-            
         }
     }
     

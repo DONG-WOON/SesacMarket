@@ -7,9 +7,10 @@
 
 import Foundation
 
-final class SearchViewModel {
+final class SearchViewModel: ValidateTextProtocol {
+    // ⭐️ TO DO: usecase추가  ⭐️
+    
     let repository = WishItemEntityRepository()
-
     
     var items: [Item] = []
     var page = 1
