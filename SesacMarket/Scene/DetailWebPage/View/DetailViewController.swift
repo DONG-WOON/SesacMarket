@@ -35,19 +35,27 @@ class DetailViewController<T: Product>: BaseViewController, WKUIDelegate {
         webView.load(request)
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        let isWished = viewModel.isWished()
+        updateWishButton(isWished: isWished)
+    }
+    
     override func configureViews() {
+        super.configureViews()
+        
         view.addSubview(webView)
         title = viewModel.item.validatedTitle
         navigationItem.rightBarButtonItem = wishBarButton
         navigationItem.backButtonTitle = "검색"
+        
         updateWishButton(isWished: viewModel.item.isWished)
     }
     
-    override func setAttributes() {
-
-    }
-    
     override func setConstraints() {
+        super.setConstraints()
+        
         webView.snp.makeConstraints { make in
             make.edges.equalTo(view.safeAreaLayoutGuide)
         }

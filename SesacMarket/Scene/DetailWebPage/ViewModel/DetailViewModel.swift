@@ -23,7 +23,11 @@ class DetailViewModel<T: Product> {
     func wishButtonAction() throws -> Bool {
         item.isWished.toggle()
         
-        guard WishItemEntityRepository.shared.fetchItem(WishItemEntity.self, forPrimaryKeyPath: item.productID) != nil else {
+        let isWished = isWished()
+        
+        if isWished {
+            removeWish(item)
+        } else {
             do {
                 try addWish(item)
                 return item.isWished
@@ -31,7 +35,6 @@ class DetailViewModel<T: Product> {
                 throw RepositoryError.saveError
             }
         }
-        removeWish(item)
         return item.isWished
     }
     
@@ -42,5 +45,10 @@ class DetailViewModel<T: Product> {
     func removeWish(_ item: T) {
         guard let wishItemEntity = WishItemEntityRepository.shared.fetchItem(WishItemEntity.self, forPrimaryKeyPath: item.productID) else { return }
         WishItemEntityRepository.shared.deleteItem(wishItemEntity)
+    }
+    
+    func isWished() -> Bool {
+        guard let _ = WishItemEntityRepository.shared.fetchItem(WishItemEntity.self, forPrimaryKeyPath: item.productID) else { return false }
+        return true
     }
 }

@@ -18,9 +18,9 @@ enum NetworkError: Error {
     var message: String {
         switch self {
             
-        case .invalidQuery, .invalidURL:
+        case .invalidQuery, .invalidURL, .mappingError:
             return "검색어가 잘못되었습니다. 다시 입력해주세요."
-        case .serverError, .mappingError, .statusCodeIsNil, .unknown:
+        case .serverError, .statusCodeIsNil, .unknown:
             return "서버에 오류가 발생했습니다. 나중에 다시 시도해주세요."
         }
     }
