@@ -57,7 +57,8 @@ final class SearchViewController: BaseViewController {
 extension SearchViewController: UISearchBarDelegate {
     
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        
+        viewModel.page = 1
+        viewModel.items.removeAll()
         viewModel.fetchItem(search: searchBar.text) {
             self.mainView.collectionView.reloadData()
         } onFailure: { error in
@@ -92,7 +93,8 @@ extension SearchViewController: UICollectionViewDataSource {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: SearchItemCell.identifier, for: indexPath) as? SearchItemCell else { return UICollectionViewCell() }
        
         viewModel.checkWishItem(in: [indexPath])
-        
+        print(viewModel.items.count)
+        print(indexPath)
         cell.update(item: viewModel.items[indexPath.item])
         
         cell.wishButtonAction = { [weak self] in
@@ -139,6 +141,7 @@ extension SearchViewController: UICollectionViewDataSourcePrefetching {
         let collectionView = mainView.collectionView
         guard collectionView.frame.size.height > 0 else { return }
         if offsetY + collectionView.frame.size.height >= collectionView.contentSize.height - 200 {
+            viewModel.page += 1
             viewModel.fetchItem(search: mainView.searchBar.text) {
                 collectionView.reloadData()
             } onFailure: { error in
