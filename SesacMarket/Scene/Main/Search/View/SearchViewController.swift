@@ -75,6 +75,7 @@ extension SearchViewController: SortButtonDelegate {
 extension SearchViewController: UISearchBarDelegate {
     
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        viewModel.isLoading = false
         viewModel.page = 1
         viewModel.items.removeAll()
         viewModel.searchString = searchBar.text
@@ -114,10 +115,7 @@ extension SearchViewController: UICollectionViewDataSource {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: SearchItemCell.identifier, for: indexPath) as? SearchItemCell else { return UICollectionViewCell() }
        
         viewModel.checkWishItem(in: [indexPath])
-        
-        print(viewModel.items.count)
-        print(indexPath)
-        
+    
         cell.update(item: viewModel.items[indexPath.item])
         
         cell.wishButtonAction = { [weak self] in
@@ -132,16 +130,6 @@ extension SearchViewController: UICollectionViewDataSource {
         
         return cell
     }
-    
-    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-//        viewModel.checkWishItem(indexPath: indexPath)
-        
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-//        viewModel.checkWishItem(indexPath: indexPath)
-    }
-    
 }
 
 
@@ -164,6 +152,7 @@ extension SearchViewController: UICollectionViewDataSourcePrefetching {
         let collectionView = mainView.collectionView
         let deviceHeight = UIScreen.main.bounds.height
         guard scrollView.frame.size.height > 0 else { return }
+        
         guard !viewModel.isLoading else { return }
         
         if offsetY + scrollView.frame.size.height >= scrollView.contentSize.height - (deviceHeight) {

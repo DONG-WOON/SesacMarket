@@ -7,11 +7,11 @@
 
 import Foundation
 
-class DetailViewModel<T: Product> {
+class DetailViewModel {
     
-    var item: T
+    var item: Item
     
-    init(item: T) {
+    init(item: Item) {
         self.item = item
     }
     
@@ -42,7 +42,7 @@ class DetailViewModel<T: Product> {
         }
     }
     
-    func addWish(_ item: T) throws {
+    func addWish(_ item: Item) throws {
         try WishItemEntityRepository.shared.createItem(item)
     }
     

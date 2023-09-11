@@ -8,13 +8,13 @@
 import UIKit
 import WebKit
 
-class DetailViewController<T: Product>: BaseViewController, WKUIDelegate {
+class DetailViewController: BaseViewController, WKUIDelegate {
     var webView: WKWebView
-    let viewModel: DetailViewModel<T>
+    let viewModel: DetailViewModel
    
     lazy var wishBarButton = UIBarButtonItem(image: UIImage(systemName: Image.wish), style: .plain, target: self, action: #selector(wishButtonDidTapped))
     
-    init(item: T) {
+    init(item: Item) {
         self.viewModel = DetailViewModel(item: item)
         let webConfiguration = WKWebViewConfiguration()
         webView = WKWebView(frame: .zero, configuration: webConfiguration)

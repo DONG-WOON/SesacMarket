@@ -8,25 +8,15 @@
 import Foundation
 import RealmSwift
 
-protocol Repository {
-    associatedtype T: Product
-    
-    func fetchWishItems() -> [Product]
-    func fetchWishItem(forPrimaryKeyPath: String) -> Product?
-    func createItem(_ item: T) throws
-    func updateItem(_ item: T, update: (WishItemEntity?) -> Void) throws
-    func deleteItem(_ item: T) throws
-}
-
-final class WishItemEntityRepository: Repository {
-    typealias T = Item
+final class WishItemEntityRepository {
+    typealias T = Product
     static let shared = WishItemEntityRepository()
     
     private let realm = try! Realm()
     
     private init() { }
     
-    func fetchWishItems() -> [Product] {
+    func fetchWishItems() -> [Item] {
         let result = fetchWishItemEntities()
         return result.map { $0.convertToItem() }
     }
@@ -36,7 +26,7 @@ final class WishItemEntityRepository: Repository {
         return result
     }
     
-    func fetchWishItem(forPrimaryKeyPath: String) -> Product? {
+    func fetchWishItem(forPrimaryKeyPath: String) -> Item? {
         return fetchWishItem(forPrimaryKeyPath: forPrimaryKeyPath)?.convertToItem()
     }
     
@@ -46,7 +36,7 @@ final class WishItemEntityRepository: Repository {
         return result
     }
     
-    func createItem(_ item: T) throws {
+    func createItem(_ item: Item) throws {
         do {
             try realm.write{
                 realm.add(WishItemEntity(domain: item))
@@ -56,7 +46,7 @@ final class WishItemEntityRepository: Repository {
         }
     }
     
-    func updateItem(_ item: T, update: (WishItemEntity?) -> Void) throws {
+    func updateItem(_ item: Item, update: (WishItemEntity?) -> Void) throws {
         
         guard let wishItem = realm.object(ofType: WishItemEntity.self, forPrimaryKey: item.productID) else {
             throw SesacError.updateError
@@ -72,7 +62,7 @@ final class WishItemEntityRepository: Repository {
         }
     }
 
-    func deleteItem(_ item: T) throws {
+    func deleteItem(_ item: Item) throws {
         guard let wishItem = realm.object(ofType: WishItemEntity.self, forPrimaryKey: item.productID) else {
             throw SesacError.doNotDelete
         }

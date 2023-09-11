@@ -27,6 +27,9 @@ final class SearchViewModel: ValidateTextProtocol {
             return APIManager.shared.request(search: search, page: page, sort: sort)
             { [weak self] items in
                 guard let self else { return }
+                if items.last?.productID == self.items.last?.productID {
+                    return
+                }
                 self.items.append(contentsOf: items)
                 completion()
             } onFailure: { error in
@@ -53,9 +56,8 @@ final class SearchViewModel: ValidateTextProtocol {
     }
     
     func removeWish(_ item: Item) throws {
-        guard let wishItemEntity = WishItemEntityRepository.shared.fetchWishItem(forPrimaryKeyPath: item.productID) else { return }
         do {
-            try WishItemEntityRepository.shared.deleteItem(wishItemEntity)
+            try WishItemEntityRepository.shared.deleteItem(item)
         } catch {
             throw SesacError.doNotDelete
         }

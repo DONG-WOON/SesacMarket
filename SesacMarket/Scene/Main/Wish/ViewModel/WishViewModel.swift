@@ -16,7 +16,7 @@ final class WishViewModel: ValidateTextProtocol {
         let result = validate(text: searchText)
         switch result {
         case .success(let text):
-            wishItems = WishItemEntityRepository.shared.fetchWishItems().filter({ $0.title.uppercased().contains(text.uppercased()) })
+            wishItems = WishItemEntityRepository.shared.fetchWishItems().filter({ $0.title.uppercased().contains( text.uppercased()) })
             completion()
         case .failure(_):
             wishItems = WishItemEntityRepository.shared.fetchWishItems()
