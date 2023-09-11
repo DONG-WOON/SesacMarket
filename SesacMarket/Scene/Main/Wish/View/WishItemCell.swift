@@ -13,7 +13,7 @@ final class WishItemCell: BaseItemCell {
         super.prepareForReuse()
     }
     
-    func update(item: WishItemEntity) {
+    func update(item: Item) {
         mallNameLabel.text = item.mallName
         titleLabel.text = item.title
         priceLabel.text = item.price

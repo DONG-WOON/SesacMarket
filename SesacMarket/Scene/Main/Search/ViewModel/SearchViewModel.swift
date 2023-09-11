@@ -14,13 +14,15 @@ final class SearchViewModel: ValidateTextProtocol {
     var items: [Item] = []
     var page = 1
     var sort: Sort = .sim
+    var searchString: String?
+    var isLoading = false
     
     var prefetchingIndexPaths: [IndexPath: Cancelable?] = [:]
     
     @discardableResult
-    func fetchItem(search: String?, completion: @escaping () -> Void, onFailure: @escaping (Error) -> Void) -> Cancelable? {
-        items.removeAll()
-        let result = validate(text: search)
+    // ⭐️ TO DO: 검색어를 중간에 지울경우 이슈 생김 ⭐️
+    func fetchItem(completion: @escaping () -> Void, onFailure: @escaping (SesacError) -> Void) -> Cancelable? {
+        let result = validate(text: searchString)
         switch result {
         case .success(let search):
             return APIManager.shared.request(search: search, page: page, sort: sort)
@@ -48,12 +50,16 @@ final class SearchViewModel: ValidateTextProtocol {
     
     // repository
     func addWish(_ item: Item) throws {
-        try WishItemEntityRepository.shared.createItem(WishItemEntity(domain: item))
+        try WishItemEntityRepository.shared.createItem(item)
     }
     
-    func removeWish(_ item: Item) {
-        guard let wishItemEntity = WishItemEntityRepository.shared.fetchItem(WishItemEntity.self, forPrimaryKeyPath: item.productID) else { return }
-        WishItemEntityRepository.shared.deleteItem(wishItemEntity)
+    func removeWish(_ item: Item) throws {
+        guard let wishItemEntity = WishItemEntityRepository.shared.fetchWishItem(forPrimaryKeyPath: item.productID) else { return }
+        do {
+            try WishItemEntityRepository.shared.deleteItem(wishItemEntity)
+        } catch {
+            throw SesacError.doNotDelete
+        }
     }
     
     func checkWishItem(in indexPaths: [IndexPath], completion: ((IndexPath) -> Void)? = nil) {
@@ -61,7 +67,7 @@ final class SearchViewModel: ValidateTextProtocol {
         
         for indexPath in indexPaths {
             let item = items[indexPath.item]
-            let wishItem = WishItemEntityRepository.shared.fetchItem(WishItemEntity.self, forPrimaryKeyPath: item.productID)
+            let wishItem = WishItemEntityRepository.shared.fetchWishItem(forPrimaryKeyPath: item.productID)
             
             items[indexPath.item].isWished = wishItem != nil ? true : false
             completion?(indexPath)
@@ -76,10 +82,14 @@ final class SearchViewModel: ValidateTextProtocol {
             do {
                 try addWish(item)
             } catch {
-                throw RepositoryError.saveError
+                throw SesacError.saveError
             }
         } else {
-            removeWish(item)
+            do {
+                try removeWish(item)
+            } catch {
+                throw SesacError.doNotDelete
+            }
         }
     }
 }

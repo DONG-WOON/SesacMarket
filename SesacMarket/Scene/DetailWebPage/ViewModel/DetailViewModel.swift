@@ -26,29 +26,37 @@ class DetailViewModel<T: Product> {
         let isWished = isWished()
         
         if isWished {
-            removeWish(item)
+            do {
+                try removeWish()
+                return item.isWished
+            } catch {
+                throw SesacError.doNotDelete
+            }
         } else {
             do {
                 try addWish(item)
                 return item.isWished
             } catch {
-                throw RepositoryError.saveError
+                throw SesacError.saveError
             }
         }
-        return item.isWished
     }
     
     func addWish(_ item: T) throws {
-        try WishItemEntityRepository.shared.createItem(WishItemEntity(domain: item))
+        try WishItemEntityRepository.shared.createItem(item)
     }
     
-    func removeWish(_ item: T) {
-        guard let wishItemEntity = WishItemEntityRepository.shared.fetchItem(WishItemEntity.self, forPrimaryKeyPath: item.productID) else { return }
-        WishItemEntityRepository.shared.deleteItem(wishItemEntity)
+    func removeWish() throws {
+        guard let wishItemEntity = WishItemEntityRepository.shared.fetchWishItem(forPrimaryKeyPath: item.productID) else { return }
+        do {
+           try WishItemEntityRepository.shared.deleteItem(wishItemEntity)
+        } catch {
+            throw SesacError.doNotDelete
+        }
     }
     
     func isWished() -> Bool {
-        guard let _ = WishItemEntityRepository.shared.fetchItem(WishItemEntity.self, forPrimaryKeyPath: item.productID) else { return false }
+        guard let _ = WishItemEntityRepository.shared.fetchWishItem(forPrimaryKeyPath: item.productID) else { return false }
         return true
     }
 }

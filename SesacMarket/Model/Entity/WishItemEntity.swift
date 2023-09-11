@@ -50,6 +50,10 @@ class WishItemEntity: Object, Product {
         self.maker = domain.maker
         self.isWished = domain.isWished
     }
+    
+    func convertToItem() -> Item {
+        return Item(entity: self)
+    }
 }
 
 

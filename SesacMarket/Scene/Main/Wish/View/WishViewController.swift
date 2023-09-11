@@ -28,22 +28,24 @@ final class WishViewController: BaseViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+
+        viewModel.fetchWish() {
+            mainView.collectionView.reloadData()
+        }
+    }
+    
+    override func configureViews() {
+        super.configureViews()
         
         mainView.searchBar.delegate = self
         mainView.collectionView.delegate = self
         mainView.collectionView.dataSource = self
         mainView.collectionView.prefetchDataSource = self
         mainView.collectionView.register(WishItemCell.self, forCellWithReuseIdentifier: WishItemCell.identifier)
-        
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        // ⭐️ TO DO: 매번 요청하는 것 바꾸는것 고려. ⭐️
-        
-        viewModel.fetchWish() {
-            mainView.collectionView.reloadData()
-        }
     }
 }
 
@@ -51,13 +53,25 @@ final class WishViewController: BaseViewController {
 
 extension WishViewController: UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-    
+        viewModel.searchText = searchBar.text
+        viewModel.fetchWish {
+            mainView.collectionView.reloadData()
+        }
     }
     
     func searchBarShouldEndEditing(_ searchBar: UISearchBar) -> Bool {
+        
+        
         searchBar.resignFirstResponder()
         
         return true
+    }
+    
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        viewModel.searchText = nil
+        viewModel.fetchWish {
+            mainView.collectionView.reloadData()
+        }
     }
 }
 
@@ -70,19 +84,17 @@ extension WishViewController: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: WishItemCell.identifier, for: indexPath) as? WishItemCell else { return UICollectionViewCell() }
-        
-        cell.update(item: viewModel.wishItems[indexPath.item])
+        let item = viewModel.wishItems[indexPath.item]
+        cell.update(item: item)
         
         cell.wishButtonAction = { [weak self] in
-            guard let item = self?.viewModel.wishItems[indexPath.item] else { return }
-            let itemIsWished = item.isWished
-            // 다르게 구현
-            if itemIsWished {
-                self?.viewModel.removeWish(item)
+            do {
+                try self?.viewModel.removeWish(item)
+                collectionView.reloadData()
+            } catch {
+                self?.showAlertMessage(title: "삭제 실패", message: (error as? SesacError)?.message)
             }
-            collectionView.reloadData()
         }
-        
         return cell
     }
 }

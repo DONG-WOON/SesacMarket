@@ -62,7 +62,7 @@ extension SearchViewController: SortButtonDelegate {
         guard !viewModel.items.isEmpty else { return }
         viewModel.items.removeAll()
         viewModel.page = 1
-        viewModel.fetchItem(search: mainView.searchBar.text) {
+        viewModel.fetchItem() {
             self.mainView.collectionView.reloadData()
         } onFailure: { error in
             self.showAlertMessage(title: "검색 실패", message: error.message)
@@ -77,7 +77,8 @@ extension SearchViewController: UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         viewModel.page = 1
         viewModel.items.removeAll()
-        viewModel.fetchItem(search: searchBar.text) {
+        viewModel.searchString = searchBar.text
+        viewModel.fetchItem() {
             self.mainView.collectionView.reloadData()
         } onFailure: { error in
             self.showAlertMessage(title: "검색 실패", message: error.message)
@@ -123,7 +124,7 @@ extension SearchViewController: UICollectionViewDataSource {
             do {
                 try self?.viewModel.wishButtonAction(in: indexPath)
             } catch {
-                self?.showAlertMessage(title: "저장 오류", message: error.message)
+                self?.showAlertMessage(title: "저장 오류", message: (error as? SesacError)?.message)
                 return
             }
             collectionView.reloadItems(at: [indexPath])
@@ -161,10 +162,17 @@ extension SearchViewController: UICollectionViewDataSourcePrefetching {
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let offsetY = scrollView.contentOffset.y
         let collectionView = mainView.collectionView
-        guard collectionView.frame.size.height > 0 else { return }
-        if offsetY + collectionView.frame.size.height >= collectionView.contentSize.height - 200 {
+        let deviceHeight = UIScreen.main.bounds.height
+        guard scrollView.frame.size.height > 0 else { return }
+        guard !viewModel.isLoading else { return }
+        
+        if offsetY + scrollView.frame.size.height >= scrollView.contentSize.height - (deviceHeight) {
+            viewModel.isLoading = true
+            guard !viewModel.items.isEmpty else { return }
+           
             viewModel.page += 1
-            viewModel.fetchItem(search: mainView.searchBar.text) {
+            viewModel.fetchItem() {
+                self.viewModel.isLoading = false
                 collectionView.reloadData()
             } onFailure: { error in
                 self.showAlertMessage(title: "검색 실패", message: error.message)

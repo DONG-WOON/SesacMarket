@@ -9,106 +9,80 @@ import Foundation
 import RealmSwift
 
 protocol Repository {
-    associatedtype T: Object
+    associatedtype T: Product
     
-    func fetchItems(_ item: T.Type) -> Results<T>
-    func fetchItem(_ item: T.Type, forPrimaryKeyPath: String) -> T?
+    func fetchWishItems() -> [Product]
+    func fetchWishItem(forPrimaryKeyPath: String) -> Product?
     func createItem(_ item: T) throws
-    func updateItem(_ item: T, update: (T) -> Void) throws
-    func deleteItems(_ item: Results<T>)
-    func deleteItem(_ item: T)
-}
-
-enum RepositoryError: Error {
-    case fetchError
-    case saveError
-    case itemIsNil
-    case itemIsInvalid
-    case updateError
-    
-    var message: String {
-        switch self {
-        case .fetchError:
-            return "불러오기에 실패하였습니다. 잠시 후 다시 시도해주세요."
-        case .saveError:
-            return "저장에 실패하였습니다. 잠시 후 다시 시도해주세요."
-        case .itemIsNil:
-            return "유효하지 않은 상품입니다."
-        case .itemIsInvalid:
-            return "유효하지 않은 상품입니다."
-        case .updateError:
-            return "업데이트에 실패하였습니다. 잠시 후 다시 시도해주세요."
-        }
-    }
+    func updateItem(_ item: T, update: (WishItemEntity?) -> Void) throws
+    func deleteItem(_ item: T) throws
 }
 
 final class WishItemEntityRepository: Repository {
-    typealias T = WishItemEntity
-    
+    typealias T = Item
     static let shared = WishItemEntityRepository()
     
     private let realm = try! Realm()
-    private var wishItemEntities: Results<T>!
     
-    private init() {
-        self.wishItemEntities = fetchItems(T.self)
+    private init() { }
+    
+    func fetchWishItems() -> [Product] {
+        let result = fetchWishItemEntities()
+        return result.map { $0.convertToItem() }
     }
     
-    func fetchItems(_ item: T.Type) -> Results<T> {
-        let result = realm.objects(item)
+    private func fetchWishItemEntities() -> Results<WishItemEntity> {
+        let result = realm.objects(WishItemEntity.self)
         return result
     }
     
-    func fetchItem(_ item: T.Type, forPrimaryKeyPath: String) -> T? {
-        let result = realm.object(ofType: item, forPrimaryKey: forPrimaryKeyPath)
+    func fetchWishItem(forPrimaryKeyPath: String) -> Product? {
+        return fetchWishItem(forPrimaryKeyPath: forPrimaryKeyPath)?.convertToItem()
+    }
+    
+    
+    private func fetchWishItem(forPrimaryKeyPath: String) -> WishItemEntity? {
+        let result = realm.object(ofType: WishItemEntity.self, forPrimaryKey: forPrimaryKeyPath)
         return result
     }
     
     func createItem(_ item: T) throws {
         do {
             try realm.write{
-                realm.add(item)
+                realm.add(WishItemEntity(domain: item))
             }
         } catch {
-            throw RepositoryError.saveError
+            throw SesacError.saveError
         }
     }
     
-    func updateItem(_ item: T, update: (T) -> Void) throws {
+    func updateItem(_ item: T, update: (WishItemEntity?) -> Void) throws {
+        
+        guard let wishItem = realm.object(ofType: WishItemEntity.self, forPrimaryKey: item.productID) else {
+            throw SesacError.updateError
+        }
+        
         do {
             try realm.write{
-                update(item)
-                realm.add(item, update: .modified)
+                update(wishItem)
+                realm.add(wishItem, update: .modified)
             }
         } catch {
-            throw RepositoryError.updateError
+            throw SesacError.updateError
         }
     }
-    
-    func deleteItems(_ item: Results<T>) {
+
+    func deleteItem(_ item: T) throws {
+        guard let wishItem = realm.object(ofType: WishItemEntity.self, forPrimaryKey: item.productID) else {
+            throw SesacError.doNotDelete
+        }
         do {
             try realm.write {
-                realm.delete(item)
+                realm.delete(wishItem)
             }
         } catch {
-            print(error)
+            throw SesacError.doNotDelete
         }
-      
-    }
-    
-    func deleteItem(_ item: T) {
-        do {
-            try realm.write {
-                realm.delete(item)
-            }
-        } catch {
-            print(error)
-        }
-    }
-    
-    func fetchSortedItem<U>(by keyPath: KeyPath<T, U>, ascending: Bool = true) -> Results<T> where U: _HasPersistedType, U.PersistedType : SortableType {
-        let data = realm.objects(T.self).sorted(by: keyPath, ascending: ascending)
-        return data
     }
 }
 
