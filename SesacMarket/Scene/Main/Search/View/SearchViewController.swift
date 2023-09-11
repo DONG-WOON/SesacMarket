@@ -134,6 +134,15 @@ extension SearchViewController: UICollectionViewDataSourcePrefetching {
     func collectionView(_ collectionView: UICollectionView, prefetchItemsAt indexPaths: [IndexPath]) {
     }
     
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        let offsetY = scrollView.contentOffset.y
+        let collectionView = mainView.collectionView
+        guard collectionView.frame.size.height > 0 else { return }
+        if offsetY + collectionView.frame.size.height >= collectionView.contentSize.height - 200 {
+            viewModel.fetchItem(search: mainView.searchBar.text) {
+                collectionView.reloadData()
+            } onFailure: { error in
+                self.showAlertMessage(title: "검색 실패", message: error.message)
             }
         }
     }
