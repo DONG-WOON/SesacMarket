@@ -42,13 +42,15 @@ enum RepositoryError: Error {
     }
 }
 
-final class WishItemEntityRepository<T: WishItemEntity>: Repository {
+final class WishItemEntityRepository: Repository {
+    typealias T = WishItemEntity
+    
+    static let shared = WishItemEntityRepository()
     
     private let realm = try! Realm()
+    private var wishItemEntities: Results<T>!
     
-    var wishItemEntities: Results<T>!
-    
-    init() {
+    private init() {
         self.wishItemEntities = fetchItems(T.self)
     }
     

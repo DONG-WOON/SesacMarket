@@ -9,15 +9,14 @@ import Foundation
 import RealmSwift
 
 final class WishViewModel {
-    let repository = WishItemEntityRepository()
     var wishItems: Results<WishItemEntity>!
     
     func fetchWish(_ search: String? = nil, completion: () -> Void) {
-        wishItems = repository.fetchItems(WishItemEntity.self)
+        wishItems = WishItemEntityRepository.shared.fetchItems(WishItemEntity.self)
         completion()
     }
     
     func removeWish(_ item: WishItemEntity) {
-        repository.deleteItem(item)
+        WishItemEntityRepository.shared.deleteItem(item)
     }
 }

@@ -6,11 +6,10 @@
 //
 
 import Foundation
+import Combine
 
 final class SearchViewModel: ValidateTextProtocol {
     // ⭐️ TO DO: usecase추가  ⭐️
-    
-    let repository = WishItemEntityRepository()
     
     var items: [Item] = []
     var page = 1
@@ -49,12 +48,12 @@ final class SearchViewModel: ValidateTextProtocol {
     
     // repository
     func addWish(_ item: Item) throws {
-        try repository.createItem(WishItemEntity(domain: item))
+        try WishItemEntityRepository.shared.createItem(WishItemEntity(domain: item))
     }
     
     func removeWish(_ item: Item) {
-        guard let wishItemEntity = repository.fetchItem(WishItemEntity.self, forPrimaryKeyPath: item.productID) else { return }
-        repository.deleteItem(wishItemEntity)
+        guard let wishItemEntity = WishItemEntityRepository.shared.fetchItem(WishItemEntity.self, forPrimaryKeyPath: item.productID) else { return }
+        WishItemEntityRepository.shared.deleteItem(wishItemEntity)
     }
     
     func checkWishItem(in indexPaths: [IndexPath], completion: ((IndexPath) -> Void)? = nil) {
@@ -62,7 +61,7 @@ final class SearchViewModel: ValidateTextProtocol {
         
         for indexPath in indexPaths {
             let item = items[indexPath.item]
-            let wishItem = repository.fetchItem(WishItemEntity.self, forPrimaryKeyPath: item.productID)
+            let wishItem = WishItemEntityRepository.shared.fetchItem(WishItemEntity.self, forPrimaryKeyPath: item.productID)
             
             items[indexPath.item].isWished = wishItem != nil ? true : false
             completion?(indexPath)
