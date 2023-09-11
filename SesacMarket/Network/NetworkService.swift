@@ -47,7 +47,7 @@ extension NetworkService: TargetType {
             return .requestParameters(parameters: ["query": query,
                                                    "display": display,
                                                    "start": start,
-                                                   "sort": sort.rawValue],
+                                                   "sort": sort.string],
                                       encoding: URLEncoding.queryString)
         case .web:
             return .requestPlain

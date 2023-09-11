@@ -7,14 +7,22 @@
 
 import UIKit
 
+protocol SortButtonDelegate: AnyObject {
+    func sortButtonDidTapped(_ sort: Sort)
+}
+
 class SearchViewHeaderView: UICollectionReusableView, UIConfigurable {
 
+    weak var delegate: SortButtonDelegate?
+    var currentSort: Sort?
+    
     lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout())
 
     override init(frame: CGRect) {
         super.init(frame: frame)
 
         configureViews()
+        setAttributes()
         setConstraints()
     }
 
@@ -24,9 +32,14 @@ class SearchViewHeaderView: UICollectionReusableView, UIConfigurable {
 
     func configureViews() {
         collectionView.dataSource = self
+        collectionView.delegate = self
         collectionView.register(SearchViewHeaderViewCell.self, forCellWithReuseIdentifier: SearchViewHeaderViewCell.identifier)
         
         addSubview(collectionView)
+    }
+    
+    func setAttributes() {
+        collectionView.allowsMultipleSelection = false
     }
 
     func setConstraints() {
@@ -43,8 +56,28 @@ extension SearchViewHeaderView: UICollectionViewDataSource {
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: SearchViewHeaderViewCell.identifier, for: indexPath) as? SearchViewHeaderViewCell else { return UICollectionViewCell() }
-        cell.update(title: Sort.allCases[indexPath.row].title)
+    
+        cell.update(sort: Sort.allCases[indexPath.row])
+        
+        if indexPath.item == currentSort?.rawValue {
+            cell.isSelected = true
+            collectionView.selectItem(at: indexPath, animated: false, scrollPosition: .init())
+        } else {
+            cell.isSelected = false
+        }
+        
         return cell
+    }
+}
+
+extension SearchViewHeaderView: UICollectionViewDelegate {
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        guard let sort = Sort(rawValue: indexPath.item) else { return }
+        
+        if currentSort != sort {
+            currentSort = sort
+            delegate?.sortButtonDidTapped(sort)
+        }
     }
 }
 

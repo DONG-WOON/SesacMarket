@@ -43,7 +43,6 @@ class BaseItemCell: UICollectionViewCell, UIConfigurable {
     }
     
     func configureViews() {
-        
         contentView.addSubview(itemImageView)
         contentView.addSubview(mallNameLabel)
         contentView.addSubview(titleLabel)

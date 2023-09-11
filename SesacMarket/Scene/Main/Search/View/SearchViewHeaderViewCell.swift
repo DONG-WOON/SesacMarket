@@ -33,6 +33,9 @@ class SearchViewHeaderViewCell: UICollectionViewCell, UIConfigurable {
     
     override func prepareForReuse() {
         super.prepareForReuse()
+        
+        roundedView.backgroundColor = .systemBackground
+        roundedView.label.textColor = .label
     }
     
     func configureViews() {
@@ -50,7 +53,7 @@ class SearchViewHeaderViewCell: UICollectionViewCell, UIConfigurable {
         }
     }
     
-    func update(title: String) {
-        roundedView.setTitle(title)
+    func update(sort: Sort) {
+        roundedView.setTitle(sort.title)
     }
 }

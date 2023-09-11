@@ -42,6 +42,8 @@ final class SearchViewController: BaseViewController {
     }
     
     override func configureViews() {
+        super.configureViews()
+        
         mainView.searchBar.delegate = self
         
         mainView.collectionView.delegate = self
@@ -49,6 +51,22 @@ final class SearchViewController: BaseViewController {
         mainView.collectionView.prefetchDataSource = self
         mainView.collectionView.register(SearchItemCell.self, forCellWithReuseIdentifier: SearchItemCell.identifier)
         mainView.collectionView.register(SearchViewHeaderView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: SearchViewHeaderView.identifier)
+    }
+}
+
+// MARK: SortButton Delegate
+
+extension SearchViewController: SortButtonDelegate {
+    func sortButtonDidTapped(_ sort: Sort) {
+        viewModel.sort = sort
+        guard !viewModel.items.isEmpty else { return }
+        viewModel.items.removeAll()
+        viewModel.page = 1
+        viewModel.fetchItem(search: mainView.searchBar.text) {
+            self.mainView.collectionView.reloadData()
+        } onFailure: { error in
+            self.showAlertMessage(title: "검색 실패", message: error.message)
+        }
     }
 }
 
@@ -80,7 +98,9 @@ extension SearchViewController: UISearchBarDelegate {
 extension SearchViewController: UICollectionViewDataSource {
    
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
-        let headerView = collectionView.dequeueReusableSupplementaryView(ofKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: SearchViewHeaderView.identifier, for: indexPath)
+        guard let headerView = collectionView.dequeueReusableSupplementaryView(ofKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: SearchViewHeaderView.identifier, for: indexPath) as? SearchViewHeaderView else { return UICollectionReusableView() }
+        headerView.currentSort = viewModel.sort
+        headerView.delegate = self
         return headerView
     }
     
@@ -93,8 +113,10 @@ extension SearchViewController: UICollectionViewDataSource {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: SearchItemCell.identifier, for: indexPath) as? SearchItemCell else { return UICollectionViewCell() }
        
         viewModel.checkWishItem(in: [indexPath])
+        
         print(viewModel.items.count)
         print(indexPath)
+        
         cell.update(item: viewModel.items[indexPath.item])
         
         cell.wishButtonAction = { [weak self] in

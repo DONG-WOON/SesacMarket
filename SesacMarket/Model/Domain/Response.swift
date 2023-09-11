@@ -14,11 +14,24 @@ struct Response: Codable {
 }
 
 // MARK: - Sort
-enum Sort: String, CaseIterable {
-    case sim
+enum Sort: Int, CaseIterable {
+    case sim = 0
     case date
     case asc
     case dsc
+
+    var string: String {
+        switch self {
+        case .sim:
+            return "sim"
+        case .date:
+            return "date"
+        case .asc:
+            return "asc"
+        case .dsc:
+            return "dsc"
+        }
+    }
     
     var title: String {
         switch self {
