@@ -8,13 +8,13 @@
 import Foundation
 
 // MARK: - Item
-struct Item: Codable {
-    let title: String
-    let stringURL: String
-    let price: String
-    let mallName: String
-    let productID: String
-    let maker: String
+struct Item: Codable, Product {
+    var title: String
+    var stringURL: String
+    var price: String
+    var mallName: String
+    var productID: String
+    var maker: String
     var isWished: Bool = false
     
     var originalImageURL: URL? {

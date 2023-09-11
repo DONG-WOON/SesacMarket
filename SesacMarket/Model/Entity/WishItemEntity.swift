@@ -8,7 +8,7 @@
 import Foundation
 import RealmSwift
 
-class WishItemEntity: Object {
+class WishItemEntity: Object, Product {
     
     @Persisted(primaryKey: true) var productID: String
     @Persisted var title: String
@@ -20,6 +20,10 @@ class WishItemEntity: Object {
     
     var originalImageURL: URL? {
         return URL(string: stringURL)
+    }
+    
+    var validatedTitle: String {
+        return validate(text: title)
     }
     
     convenience init(productID: String, title: String, stringURL: String, price: String, mallName: String, maker: String, isWished: Bool) {
@@ -34,10 +38,10 @@ class WishItemEntity: Object {
         self.isWished = isWished
     }
     
-    convenience init(domain: Item) {
+    convenience init(domain: Product) {
         self.init()
         
-        self.title = validate(text: domain.validatedTitle)
+        self.title = validatedTitle
         self.stringURL = domain.stringURL
         self.price = domain.price
         self.mallName = domain.mallName
