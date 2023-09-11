@@ -66,7 +66,7 @@ class DetailViewController<T: Product>: BaseViewController, WKUIDelegate {
             let isWished = try viewModel.wishButtonAction()
             updateWishButton(isWished: isWished)
         } catch {
-            showAlertMessage(title: error.message)
+            showAlertMessage(title: "좋아요 저장 실패", message: (error as? SesacError)?.message)
         }
     }
     

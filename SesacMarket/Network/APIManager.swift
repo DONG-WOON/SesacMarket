@@ -14,7 +14,7 @@ struct APIManager {
     private let provider = MoyaProvider<NetworkService>()
     static let shared = APIManager()
     
-    func request(search: String, size: Int = 30, page: Int, sort: Sort, onSuccess: @escaping ([Item]) -> Void, onFailure: @escaping (NetworkError) -> Void) -> Cancellable {
+    func request(search: String, size: Int = 30, page: Int, sort: Sort, onSuccess: @escaping ([Item]) -> Void, onFailure: @escaping (SesacError) -> Void) -> Cancellable {
         return provider.request(.search(query: search, size: size, page: page, sort: sort)) { result in
             switch result {
             case .success(let response):
@@ -22,21 +22,21 @@ struct APIManager {
                     let data = try response.map(Response.self)
                     return onSuccess(data.items)
                 } catch {
-                    return onFailure(NetworkError.mappingError)
+                    return onFailure(SesacError.mappingError)
                 }
             case .failure(let error):
                 guard let statusCode = error.response?.statusCode else {
-                    return onFailure(NetworkError.statusCodeIsNil)
+                    return onFailure(SesacError.statusCodeIsNil)
                 }
                 switch statusCode {
                 case 400:
-                    return onFailure(NetworkError.invalidQuery)
+                    return onFailure(SesacError.invalidQuery)
                 case 404:
-                    return onFailure(NetworkError.invalidURL)
+                    return onFailure(SesacError.invalidURL)
                 case 500:
-                    return onFailure(NetworkError.serverError)
+                    return onFailure(SesacError.serverError)
                 default:
-                    return onFailure(NetworkError.unknown)
+                    return onFailure(SesacError.unknown)
                 }
             }
         }
