@@ -40,8 +40,9 @@ class WishItemEntity: Object, Product {
     
     convenience init(domain: Product) {
         self.init()
+        // validatedTitle이 적용되지않음
         
-        self.title = validatedTitle
+        self.title = domain.validatedTitle
         self.stringURL = domain.stringURL
         self.price = domain.price
         self.mallName = domain.mallName
