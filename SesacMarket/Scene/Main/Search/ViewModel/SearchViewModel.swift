@@ -16,23 +16,36 @@ final class SearchViewModel {
     var sort: Sort = .sim
     
     @discardableResult
-    func getItem(search: String, completion: @escaping () -> Void) -> Cancelable {
-        return APIManager.shared.request(search: search, page: page, sort: sort)
-        { [weak self] items in
-            guard let self else { return }
-            self.items.append(contentsOf: items)
-            completion()
-        } onFailure: { error in
-            print(error)
+    func fetchItem(search: String?, completion: @escaping () -> Void, onFailure: @escaping (Error) -> Void) -> Cancelable? {
+        items.removeAll()
+        let result = validate(text: search)
+        switch result {
+        case .success(let search):
+            return APIManager.shared.request(search: search, page: page, sort: sort)
+            { [weak self] items in
+                guard let self else { return }
+                self.items.append(contentsOf: items)
+                completion()
+            } onFailure: { error in
+                onFailure(error)
+            }
+        case .failure(let error):
+            onFailure(error)
+            return nil
         }
     }
     
+        }
+    }
+    
+    
+    // repository
     func addWish(_ item: Item) throws {
         try repository.createItem(WishItemEntity(domain: item))
     }
     
     func removeWish(_ item: Item) {
-        guard let wishItemEntity = repository.fetchFilter(item).first else { return }
+        guard let wishItemEntity = repository.fetchItem(WishItemEntity.self, forPrimaryKeyPath: item.productID) else { return }
         repository.deleteItem(wishItemEntity)
     }
     

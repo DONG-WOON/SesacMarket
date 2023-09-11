@@ -18,4 +18,13 @@ extension UIViewController {
         let navigationController = UINavigationController(rootViewController: self)
         return navigationController
     }
+    
+    func showAlertMessage(title: String, message: String? = nil, button: String = "확인", handler: (() -> ())? = nil ) { //매개변수 기본값
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        let ok = UIAlertAction(title: button, style: .default) { _ in
+            handler?()
+        }
+        alert.addAction(ok)
+        present(alert, animated: true)
+    }
 }

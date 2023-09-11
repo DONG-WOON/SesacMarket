@@ -12,7 +12,7 @@ protocol Repository {
     associatedtype T: Object
     
     func fetchItems(_ item: T.Type) -> Results<T>
-    func fetchItem(_ item: T.Type, forPrimaryKeyPath: KeyPath<T, ObjectId>) -> T?
+    func fetchItem(_ item: T.Type, forPrimaryKeyPath: String) -> T?
     func createItem(_ item: T) throws
     func updateItem(_ item: T, update: (T) -> Void) throws
     func deleteItems(_ item: Results<T>)
@@ -25,6 +25,21 @@ enum RepositoryError: Error {
     case itemIsNil
     case itemIsInvalid
     case updateError
+    
+    var message: String {
+        switch self {
+        case .fetchError:
+            return "불러오기에 실패하였습니다. 잠시 후 다시 시도해주세요."
+        case .saveError:
+            return "저장에 실패하였습니다. 잠시 후 다시 시도해주세요."
+        case .itemIsNil:
+            return "유효하지 않은 상품입니다."
+        case .itemIsInvalid:
+            return "유효하지 않은 상품입니다."
+        case .updateError:
+            return "업데이트에 실패하였습니다. 잠시 후 다시 시도해주세요."
+        }
+    }
 }
 
 final class WishItemEntityRepository<T: WishItemEntity>: Repository {
@@ -42,7 +57,7 @@ final class WishItemEntityRepository<T: WishItemEntity>: Repository {
         return result
     }
     
-    func fetchItem(_ item: T.Type, forPrimaryKeyPath: KeyPath<T, ObjectId>) -> T? {
+    func fetchItem(_ item: T.Type, forPrimaryKeyPath: String) -> T? {
         let result = realm.object(ofType: item, forPrimaryKey: forPrimaryKeyPath)
         return result
     }
@@ -91,12 +106,6 @@ final class WishItemEntityRepository<T: WishItemEntity>: Repository {
     
     func fetchSortedItem<U>(by keyPath: KeyPath<T, U>, ascending: Bool = true) -> Results<T> where U: _HasPersistedType, U.PersistedType : SortableType {
         let data = realm.objects(T.self).sorted(by: keyPath, ascending: ascending)
-        return data
-    }
-    
-    //수정
-    func fetchFilter(_ keyItem: Item) -> Results<T> {
-        let data = realm.objects(T.self).where { $0.productID == keyItem.productID }
         return data
     }
 }
