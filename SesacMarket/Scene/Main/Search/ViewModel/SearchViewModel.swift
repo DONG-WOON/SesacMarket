@@ -16,6 +16,8 @@ final class SearchViewModel: ValidateTextProtocol {
     var page = 1
     var sort: Sort = .sim
     
+    var prefetchingIndexPaths: [IndexPath: Cancelable?] = [:]
+    
     @discardableResult
     func fetchItem(search: String?, completion: @escaping () -> Void, onFailure: @escaping (Error) -> Void) -> Cancelable? {
         items.removeAll()
@@ -36,6 +38,11 @@ final class SearchViewModel: ValidateTextProtocol {
         }
     }
     
+    func cancelPrefetch(in indexPaths: [IndexPath]) {
+        if !prefetchingIndexPaths.isEmpty {
+            for indexPath in indexPaths {
+                prefetchingIndexPaths[indexPath]??.cancel()
+            }
         }
     }
     
@@ -50,13 +57,30 @@ final class SearchViewModel: ValidateTextProtocol {
         repository.deleteItem(wishItemEntity)
     }
     
-    func checkWishItem(indexPath: IndexPath) {
-        let item = items[indexPath.item]
-        if repository.wishItemEntities.contains(where: { $0.productID == item.productID }) {
-            items[indexPath.item].isWished = true
-        } else {
-            items[indexPath.item].isWished = false
+    func checkWishItem(in indexPaths: [IndexPath], completion: ((IndexPath) -> Void)? = nil) {
+        guard !items.isEmpty else { return }
+        
+        for indexPath in indexPaths {
+            let item = items[indexPath.item]
+            let wishItem = repository.fetchItem(WishItemEntity.self, forPrimaryKeyPath: item.productID)
+            
+            items[indexPath.item].isWished = wishItem != nil ? true : false
+            completion?(indexPath)
         }
     }
     
+    func wishButtonAction(in indexPath: IndexPath) throws {
+        items[indexPath.item].isWished.toggle()
+        let item = items[indexPath.item]
+        
+        if item.isWished {
+            do {
+                try addWish(item)
+            } catch {
+                throw RepositoryError.saveError
+            }
+        } else {
+            removeWish(item)
+        }
+    }
 }

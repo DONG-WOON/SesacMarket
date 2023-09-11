@@ -11,9 +11,7 @@ final class SearchViewController: BaseViewController {
     
     let viewModel: SearchViewModel
     let mainView = BaseView(scene: .search)
-    
-    var prefetchingIndexPaths: [IndexPath: Cancelable] = [:]
-    
+   
     init(viewModel: SearchViewModel) {
         self.viewModel = viewModel
         
@@ -37,11 +35,9 @@ final class SearchViewController: BaseViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        if !viewModel.items.isEmpty {
-            mainView.collectionView.indexPathsForVisibleItems.forEach { indexPath in
-                viewModel.checkWishItem(indexPath: indexPath)
-                mainView.collectionView.reloadItems(at: [indexPath])
-            }
+        let visibleIndexPaths = mainView.collectionView.indexPathsForVisibleItems
+        viewModel.checkWishItem(in: visibleIndexPaths) { [weak self] indexPath in
+            self?.mainView.collectionView.reloadItems(at: [indexPath])
         }
     }
     
@@ -59,21 +55,22 @@ final class SearchViewController: BaseViewController {
 // MARK: SearchBar Delegate
 
 extension SearchViewController: UISearchBarDelegate {
+    
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         
-        // ⭐️ TO DO: 텍스트 validate ⭐️
-        viewModel.items.removeAll()
-        
-        viewModel.getItem(search: searchBar.text!) {
-            // 노티나 다른걸로 전달하기
+        viewModel.fetchItem(search: searchBar.text) {
             self.mainView.collectionView.reloadData()
+        } onFailure: { error in
+            self.showAlertMessage(title: "검색 실패", message: error.message)
         }
     }
     
     func searchBarShouldEndEditing(_ searchBar: UISearchBar) -> Bool {
-        searchBar.resignFirstResponder()
-        
         return true
+    }
+    
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        searchBar.endEditing(true)
     }
 }
 
@@ -82,7 +79,7 @@ extension SearchViewController: UISearchBarDelegate {
 extension SearchViewController: UICollectionViewDataSource {
    
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
-        let headerView = collectionView.dequeueReusableSupplementaryView(ofKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: BaseButtonsView.identifier, for: indexPath)
+        let headerView = collectionView.dequeueReusableSupplementaryView(ofKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: SearchViewHeaderView.identifier, for: indexPath)
         return headerView
     }
     
@@ -93,27 +90,17 @@ extension SearchViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: SearchItemCell.identifier, for: indexPath) as? SearchItemCell else { return UICollectionViewCell() }
-        let item = viewModel.items[indexPath.item]
-        // ⭐️ TO DO: 필터 기능으로 변경하기 ⭐️
-        //        print(indexPath, "cellForRowAt")
-        if viewModel.repository.fetchFilter(item).count != 0 {
-            viewModel.items[indexPath.item].isWished = true
-        }
+       
+        viewModel.checkWishItem(in: [indexPath])
         
         cell.update(item: viewModel.items[indexPath.item])
         
         cell.wishButtonAction = { [weak self] in
-            guard let self else { return }
-            self.viewModel.items[indexPath.item].isWished.toggle()
-            // 다르게 구현
-            if self.viewModel.items[indexPath.item].isWished {
-                do {
-                    try self.viewModel.addWish(viewModel.items[indexPath.item])
-                } catch {
-                    print("관심 추가 에러")
-                }
-            } else {
-                self.viewModel.removeWish(item)
+            do {
+                try self?.viewModel.wishButtonAction(in: indexPath)
+            } catch {
+                self?.showAlertMessage(title: "저장 오류", message: error.message)
+                return
             }
             collectionView.reloadItems(at: [indexPath])
         }
@@ -137,7 +124,7 @@ extension SearchViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         // ⭐️ TO DO: 웹뷰 ⭐️
         
-        print("🔥 ")
+        print("🔥")
     }
 }
 
@@ -145,22 +132,6 @@ extension SearchViewController: UICollectionViewDelegate {
 
 extension SearchViewController: UICollectionViewDataSourcePrefetching {
     func collectionView(_ collectionView: UICollectionView, prefetchItemsAt indexPaths: [IndexPath]) {
-        for indexPath in indexPaths {
-
-//            viewModel.checkWishItem(indexPath: indexPath)
-//
-//            if indexPath.item == viewModel.items.count - 15 {
-//                viewModel.page += 1
-//
-//                let searchText = mainView.searchBar.text!
-//                prefetchingIndexPaths[indexPath] = viewModel.getItem(search: searchText) {
-//                    collectionView.reloadData()
-//                }
-//                print(indexPath, "prefetch 지금")
-//            }
-        }
-        
-        
     }
     
             }
@@ -168,9 +139,6 @@ extension SearchViewController: UICollectionViewDataSourcePrefetching {
     }
 
     func collectionView(_ collectionView: UICollectionView, cancelPrefetchingForItemsAt indexPaths: [IndexPath]) {
-        for indexPath in indexPaths {
-            prefetchingIndexPaths[indexPath]?.cancel()
-            print(indexPath, "cancel")
-        }
+        viewModel.cancelPrefetch(in: indexPaths)
     }
 }

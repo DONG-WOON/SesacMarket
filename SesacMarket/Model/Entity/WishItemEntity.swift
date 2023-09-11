@@ -10,13 +10,11 @@ import RealmSwift
 
 class WishItemEntity: Object {
     
-    @Persisted(primaryKey: true) var _id: ObjectId
-    
+    @Persisted(primaryKey: true) var productID: String
     @Persisted var title: String
     @Persisted var stringURL: String
     @Persisted var price: String
     @Persisted var mallName: String
-    @Persisted var productID: String
     @Persisted var maker: String
     @Persisted var isWished: Bool
     
@@ -24,15 +22,14 @@ class WishItemEntity: Object {
         return URL(string: stringURL)
     }
     
-    convenience init(_id: ObjectId, title: String, stringURL: String, price: String, mallName: String, productID: String, maker: String, isWished: Bool) {
+    convenience init(productID: String, title: String, stringURL: String, price: String, mallName: String, maker: String, isWished: Bool) {
         self.init()
         
-        self._id = _id
+        self.productID = productID
         self.title = title
         self.stringURL = stringURL
         self.price = price
         self.mallName = mallName
-        self.productID = productID
         self.maker = maker
         self.isWished = isWished
     }
