@@ -10,17 +10,29 @@ import Moya
 
 enum NetworkService {
     case search(query: String, size: Int, page: Int, sort: Sort)
+    case web(productID: String)
+    
+    var endPoint: String {
+        switch self {
+        case .search:
+            return "https://openapi.naver.com/v1"
+        case .web:
+            return "https://msearch.shopping.naver.com/product"
+        }
+    }
 }
 
 extension NetworkService: TargetType {
     var baseURL: URL {
-        return URL(string: "https://openapi.naver.com/v1")!
+        return URL(string: self.endPoint)!
     }
     
     var path: String {
         switch self {
         case .search:
             return "/search/shop.json"
+        case .web(productID: let productID):
+            return "/\(productID)"
         }
     }
     
@@ -37,11 +49,22 @@ extension NetworkService: TargetType {
                                                    "start": start,
                                                    "sort": sort.rawValue],
                                       encoding: URLEncoding.queryString)
+        case .web:
+            return .requestPlain
         }
     }
     
     var headers: [String : String]? {
         return ["X-Naver-Client-Id": APIKEY.client_id,
                 "X-Naver-Client-Secret": APIKEY.client_Secret]
+    }
+}
+
+extension NetworkService {
+    func getURL() -> URL {
+        var url = baseURL
+        url.appendPathComponent(path)
+        
+        return url
     }
 }
