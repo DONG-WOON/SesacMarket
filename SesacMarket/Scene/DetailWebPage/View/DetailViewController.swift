@@ -11,6 +11,7 @@ import WebKit
 class DetailViewController: BaseViewController, WKUIDelegate {
     var webView: WKWebView
     let viewModel: DetailViewModel
+    lazy var indicator = UIActivityIndicatorView(style: .large)
    
     lazy var wishBarButton = UIBarButtonItem(image: UIImage(systemName: Image.wish), style: .plain, target: self, action: #selector(wishButtonDidTapped))
     
@@ -31,6 +32,7 @@ class DetailViewController: BaseViewController, WKUIDelegate {
         let request = viewModel.requestURL()
         
         webView.uiDelegate = self
+        webView.navigationDelegate = self
         webView.allowsLinkPreview = true
         webView.load(request)
     }
@@ -46,6 +48,7 @@ class DetailViewController: BaseViewController, WKUIDelegate {
         super.configureViews()
         
         view.addSubview(webView)
+        view.addSubview(indicator)
         title = viewModel.item.validatedTitle
         navigationItem.rightBarButtonItem = wishBarButton
         navigationItem.backButtonTitle = "검색"
@@ -58,6 +61,10 @@ class DetailViewController: BaseViewController, WKUIDelegate {
         
         webView.snp.makeConstraints { make in
             make.edges.equalTo(view.safeAreaLayoutGuide)
+        }
+        
+        indicator.snp.makeConstraints { make in
+            make.center.equalTo(view)
         }
     }
     
@@ -72,5 +79,22 @@ class DetailViewController: BaseViewController, WKUIDelegate {
     
     func updateWishButton(isWished: Bool) {
         wishBarButton.image = UIImage(systemName: isWished ? Image.wishFill : Image.wish)
+    }
+}
+
+extension DetailViewController: WKNavigationDelegate {
+    func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
+        indicator.isHidden = false
+        indicator.startAnimating()
+    }
+    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        indicator.stopAnimating()
+        indicator.isHidden = true
+        guard let title = webView.title else { return }
+        navigationItem.title = title
+    }
+    func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+        indicator.stopAnimating()
+        indicator.isHidden = true
     }
 }

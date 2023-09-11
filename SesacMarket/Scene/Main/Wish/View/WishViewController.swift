@@ -44,7 +44,6 @@ final class WishViewController: BaseViewController {
         mainView.searchBar.delegate = self
         mainView.collectionView.delegate = self
         mainView.collectionView.dataSource = self
-        mainView.collectionView.prefetchDataSource = self
         mainView.collectionView.register(WishItemCell.self, forCellWithReuseIdentifier: WishItemCell.identifier)
     }
 }
@@ -60,8 +59,7 @@ extension WishViewController: UISearchBarDelegate {
     }
     
     func searchBarShouldEndEditing(_ searchBar: UISearchBar) -> Bool {
-        
-        
+
         searchBar.resignFirstResponder()
         
         return true
@@ -72,6 +70,7 @@ extension WishViewController: UISearchBarDelegate {
         viewModel.fetchWish {
             mainView.collectionView.reloadData()
         }
+        searchBar.endEditing(true)
     }
 }
 
@@ -104,23 +103,5 @@ extension WishViewController: UICollectionViewDelegate {
         let item = viewModel.wishItems[indexPath.item]
         let vc = DetailViewController(item: item)
         navigationController?.pushViewController(vc, animated: true)
-    }
-}
-
-// MARK: Prefetch
-
-extension WishViewController: UICollectionViewDataSourcePrefetching {
-    func collectionView(_ collectionView: UICollectionView, prefetchItemsAt indexPaths: [IndexPath]) {
-//        if indexPaths.contains(where: { $0.item == viewModel.items.count - 1 }) {
-//            viewModel.page += 1
-//            viewModel.getItem(search: "캠핑카") {
-//                collectionView.reloadData()
-//            }
-//        }
-
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, cancelPrefetchingForItemsAt indexPaths: [IndexPath]) {
-        return
     }
 }
