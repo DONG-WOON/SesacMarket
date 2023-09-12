@@ -79,14 +79,19 @@ extension SearchViewController: UISearchBarDelegate {
         viewModel.page = 1
         viewModel.items.removeAll()
         viewModel.searchString = searchBar.text
+        searchBar.endEditing(true)
         viewModel.fetchItem() {
             self.mainView.collectionView.reloadData()
+            if !self.viewModel.items.isEmpty {
+                self.mainView.collectionView.scrollToItem(at: IndexPath(item: 0, section: 0), at: .centeredVertically, animated: true)
+            }
         } onFailure: { error in
             self.showAlertMessage(title: "검색 실패", message: error.message)
         }
     }
     
-    func searchBarShouldEndEditing(_ searchBar: UISearchBar) -> Bool {
+    func searchBarShouldBeginEditing(_ searchBar: UISearchBar) -> Bool {
+        searchBar.setShowsCancelButton(true, animated: true)
         return true
     }
     
@@ -135,6 +140,7 @@ extension SearchViewController: UICollectionViewDataSource {
 
 extension SearchViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        mainView.searchBar.endEditing(true)
         let item = viewModel.items[indexPath.item]
         let vc = DetailViewController(item: item)
         navigationController?.pushViewController(vc, animated: true)
@@ -148,6 +154,10 @@ extension SearchViewController: UICollectionViewDataSourcePrefetching {
     }
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        if mainView.searchBar.searchTextField.isEditing {
+            mainView.searchBar.endEditing(true)
+        }
+        
         let offsetY = scrollView.contentOffset.y
         let collectionView = mainView.collectionView
         let deviceHeight = UIScreen.main.bounds.height

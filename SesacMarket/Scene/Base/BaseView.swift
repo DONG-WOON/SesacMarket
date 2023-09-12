@@ -46,7 +46,7 @@ final class BaseView: UIView, UIConfigurable, KeyboardLayoutProtocol {
     func setAttributes() {
         searchBar.backgroundColor = .systemBackground
         searchBar.tintColor = .label
-        searchBar.showsCancelButton = true
+        searchBar.setValue("취소", forKey: "cancelButtonText")
         
         collectionView.backgroundColor = .systemBackground
     }

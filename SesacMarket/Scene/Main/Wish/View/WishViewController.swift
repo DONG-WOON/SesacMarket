@@ -58,6 +58,11 @@ extension WishViewController: UISearchBarDelegate {
         }
     }
     
+    func searchBarShouldBeginEditing(_ searchBar: UISearchBar) -> Bool {
+        searchBar.setShowsCancelButton(true, animated: true)
+        return true
+    }
+    
     func searchBarShouldEndEditing(_ searchBar: UISearchBar) -> Bool {
 
         searchBar.resignFirstResponder()
@@ -96,10 +101,17 @@ extension WishViewController: UICollectionViewDataSource {
         }
         return cell
     }
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        if mainView.searchBar.searchTextField.isEditing {
+            mainView.searchBar.endEditing(true)
+        }
+    }
 }
 
 extension WishViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        mainView.searchBar.endEditing(true)
         let item = viewModel.wishItems[indexPath.item]
         let vc = DetailViewController(item: item)
         navigationController?.pushViewController(vc, animated: true)

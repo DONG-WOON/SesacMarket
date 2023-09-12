@@ -27,6 +27,10 @@ final class SearchViewModel: ValidateTextProtocol {
             return APIManager.shared.request(search: search, page: page, sort: sort)
             { [weak self] items in
                 guard let self else { return }
+                if items.isEmpty {
+                    onFailure(.invalidQuery)
+                    return
+                }
                 if items.last?.productID == self.items.last?.productID {
                     return
                 }
