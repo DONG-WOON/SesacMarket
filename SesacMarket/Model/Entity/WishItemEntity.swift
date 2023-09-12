@@ -26,6 +26,11 @@ class WishItemEntity: Object, Product {
         return validate(text: title)
     }
     
+    var decimalPrice: String {
+        guard let price = NumberFormatter.DecimalFormatter.string(from: NSNumber(floatLiteral: Double(price) ?? 0)) else { return "가격정보 없음" }
+        return price + "원"
+    }
+    
     convenience init(productID: String, title: String, stringURL: String, price: String, mallName: String, maker: String, isWished: Bool) {
         self.init()
         

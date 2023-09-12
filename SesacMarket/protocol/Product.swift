@@ -15,5 +15,7 @@ protocol Product {
     var mallName: String { get set }
     var maker: String { get set }
     var isWished: Bool { get set }
+    
     var validatedTitle: String { get }
+    var decimalPrice: String { get }
 }

@@ -42,6 +42,8 @@ class DetailViewController: BaseViewController, WKUIDelegate {
         
         let isWished = viewModel.isWished()
         updateWishButton(isWished: isWished)
+        title = viewModel.item.validatedTitle
+//        title = viewModel.item.validatedTitle
     }
     
     override func configureViews() {
@@ -49,9 +51,9 @@ class DetailViewController: BaseViewController, WKUIDelegate {
         
         view.addSubview(webView)
         view.addSubview(indicator)
-        title = viewModel.item.validatedTitle
         navigationItem.rightBarButtonItem = wishBarButton
-        navigationItem.backButtonTitle = "검색"
+//        navigationItem.title = viewModel.item.validatedTitle
+        navigationController?.title = viewModel.item.validatedTitle
         
         updateWishButton(isWished: viewModel.item.isWished)
     }
@@ -90,8 +92,6 @@ extension DetailViewController: WKNavigationDelegate {
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         indicator.stopAnimating()
         indicator.isHidden = true
-        guard let title = webView.title else { return }
-        navigationItem.title = title
     }
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
         indicator.stopAnimating()
