@@ -53,8 +53,6 @@ final class SearchViewModel: ValidateTextProtocol {
         }
     }
     
-    
-    // repository
     func addWish(_ item: Item) throws {
         try WishItemEntityRepository.shared.createItem(item)
     }

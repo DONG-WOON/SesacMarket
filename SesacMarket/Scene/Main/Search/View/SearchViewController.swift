@@ -79,7 +79,6 @@ extension SearchViewController: UISearchBarDelegate {
         viewModel.page = 1
         viewModel.items.removeAll()
         viewModel.searchString = searchBar.text
-        searchBar.endEditing(true)
         viewModel.fetchItem() {
             self.mainView.collectionView.reloadData()
             if !self.viewModel.items.isEmpty {

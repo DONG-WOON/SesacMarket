@@ -47,7 +47,7 @@ final class BaseView: UIView, UIConfigurable, KeyboardLayoutProtocol {
         searchBar.backgroundColor = .systemBackground
         searchBar.tintColor = .label
         searchBar.setValue("취소", forKey: "cancelButtonText")
-        
+        collectionView.keyboardDismissMode = .onDrag
         collectionView.backgroundColor = .systemBackground
     }
     
