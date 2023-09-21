@@ -18,8 +18,14 @@ final class SearchViewModel: ValidateTextProtocol {
     
     var prefetchingIndexPaths: [IndexPath: Cancelable?] = [:]
     
+    /*
+     viewModel.sort = sort
+     guard !viewModel.items.isEmpty else { return }
+     viewModel.items.removeAll()
+     viewModel.page = 1
+     */
+    
     @discardableResult
-
     func fetchItem(completion: @escaping () -> Void, onFailure: @escaping (SesacError) -> Void) -> Cancelable? {
         let result = validate(text: searchString)
         switch result {

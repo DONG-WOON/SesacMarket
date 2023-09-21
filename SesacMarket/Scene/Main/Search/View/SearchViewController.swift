@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SkeletonView
 
 final class SearchViewController: BaseViewController {
     
@@ -43,9 +44,8 @@ final class SearchViewController: BaseViewController {
     
     override func configureViews() {
         super.configureViews()
-        
         mainView.searchBar.delegate = self
-        
+       
         mainView.collectionView.delegate = self
         mainView.collectionView.dataSource = self
         mainView.collectionView.prefetchDataSource = self
@@ -62,6 +62,7 @@ extension SearchViewController: SortButtonDelegate {
         guard !viewModel.items.isEmpty else { return }
         viewModel.items.removeAll()
         viewModel.page = 1
+        
         viewModel.fetchItem() {
             self.mainView.collectionView.reloadData()
         } onFailure: { error in
@@ -79,8 +80,13 @@ extension SearchViewController: UISearchBarDelegate {
         viewModel.page = 1
         viewModel.items.removeAll()
         viewModel.searchString = searchBar.text
+        
+        mainView.showAnimatedGradientSkeleton()
+        
         viewModel.fetchItem() {
-            self.mainView.collectionView.reloadData()
+            self.mainView.stopSkeletonAnimation()
+            self.mainView.hideSkeleton()
+
             if !self.viewModel.items.isEmpty {
                 self.mainView.collectionView.scrollToItem(at: IndexPath(item: 0, section: 0), at: .centeredVertically, animated: true)
             }
@@ -101,8 +107,8 @@ extension SearchViewController: UISearchBarDelegate {
 
 // MARK: CollectionView
 
-extension SearchViewController: UICollectionViewDataSource {
-   
+extension SearchViewController {
+    
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         guard let headerView = collectionView.dequeueReusableSupplementaryView(ofKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: SearchViewHeaderView.identifier, for: indexPath) as? SearchViewHeaderView else { return UICollectionReusableView() }
         headerView.currentSort = viewModel.sort
@@ -132,6 +138,26 @@ extension SearchViewController: UICollectionViewDataSource {
             collectionView.reloadItems(at: [indexPath])
         }
         
+        return cell
+    }
+}
+
+extension SearchViewController: SkeletonCollectionViewDataSource {
+    
+    func numSections(in collectionSkeletonView: UICollectionView) -> Int {
+        return 1
+    }
+    
+    func collectionSkeletonView(_ skeletonView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return 10
+    }
+    
+    func collectionSkeletonView(_ skeletonView: UICollectionView, cellIdentifierForItemAt indexPath: IndexPath) -> ReusableCellIdentifier {
+        return SearchItemCell.identifier
+    }
+    
+    func collectionSkeletonView(_ skeletonView: UICollectionView, skeletonCellForItemAt indexPath: IndexPath) -> UICollectionViewCell? {
+        let cell = skeletonView.dequeueReusableCell(withReuseIdentifier: SearchItemCell.identifier, for: indexPath)
         return cell
     }
 }

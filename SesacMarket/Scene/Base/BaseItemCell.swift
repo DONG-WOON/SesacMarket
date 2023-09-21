@@ -7,6 +7,7 @@
 
 import UIKit
 import Kingfisher
+import SkeletonView
 
 class BaseItemCell: UICollectionViewCell, UIConfigurable {
     
@@ -32,6 +33,8 @@ class BaseItemCell: UICollectionViewCell, UIConfigurable {
     }
     
     override func prepareForReuse() {
+        super.prepareForReuse()
+        
         itemImageView.image = nil
         mallNameLabel.text = nil
         titleLabel.text = nil
@@ -52,30 +55,38 @@ class BaseItemCell: UICollectionViewCell, UIConfigurable {
     }
     
     func setAttributes() {
+        self.isSkeletonable = true
+        self.contentView.isSkeletonable = true
+        
         itemImageView.contentMode = .scaleAspectFill
         itemImageView.rounded()
+        itemImageView.isSkeletonable = true
         
         mallNameLabel.font = .systemFont(ofSize: 12)
         mallNameLabel.textColor = .gray
         mallNameLabel.lineBreakMode = .byTruncatingMiddle
         mallNameLabel.textAlignment = .left
         mallNameLabel.numberOfLines = 1
-    
+        mallNameLabel.isSkeletonable = true
+        
         titleLabel.font = .systemFont(ofSize: 13)
         titleLabel.textColor = .label
         titleLabel.textAlignment = .left
         titleLabel.numberOfLines = 2
         titleLabel.adjustsFontForContentSizeCategory = true
-
+        titleLabel.isSkeletonable = true
+        
         priceLabel.font = .boldSystemFont(ofSize: 15)
         priceLabel.textColor = .label
         priceLabel.textAlignment = .left
         priceLabel.numberOfLines = 1
         priceLabel.adjustsFontForContentSizeCategory = true
-
+        priceLabel.isSkeletonable = true
+        
         wishButton.tintColor = .black
         wishButton.backgroundColor = .white
         wishButton.addTarget(self, action: #selector(wishButtonDidTapped), for: .touchUpInside)
+        wishButton.isSkeletonable = true
     }
     
     override func layoutSubviews() {

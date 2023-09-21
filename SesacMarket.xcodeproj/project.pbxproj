@@ -52,6 +52,7 @@
 		7205FA0B2AAE90EE008E6C4C /* DetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7205FA0A2AAE90EE008E6C4C /* DetailViewModel.swift */; };
 		7205FA102AAE9112008E6C4C /* DetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7205FA0F2AAE9112008E6C4C /* DetailViewController.swift */; };
 		7205FA3A2AAEA42D008E6C4C /* Product.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7205FA392AAEA42D008E6C4C /* Product.swift */; };
+		72A9762B2ABC25D40021291C /* SkeletonView in Frameworks */ = {isa = PBXBuildFile; productRef = 72A9762A2ABC25D40021291C /* SkeletonView */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -104,6 +105,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7205F9B12AA9AF6A008E6C4C /* Kingfisher in Frameworks */,
+				72A9762B2ABC25D40021291C /* SkeletonView in Frameworks */,
 				7205F9AE2AA9AF5C008E6C4C /* RealmSwift in Frameworks */,
 				7205F9B62AA9B04E008E6C4C /* Moya in Frameworks */,
 				7205F9AC2AA9AF5C008E6C4C /* Realm in Frameworks */,
@@ -361,6 +363,7 @@
 				7205F9B02AA9AF6A008E6C4C /* Kingfisher */,
 				7205F9B32AA9B04E008E6C4C /* CombineMoya */,
 				7205F9B52AA9B04E008E6C4C /* Moya */,
+				72A9762A2ABC25D40021291C /* SkeletonView */,
 			);
 			productName = SesacMarket;
 			productReference = 7205F97B2AA99D26008E6C4C /* SesacMarket.app */;
@@ -395,6 +398,7 @@
 				7205F9AA2AA9AF5C008E6C4C /* XCRemoteSwiftPackageReference "realm-swift" */,
 				7205F9AF2AA9AF6A008E6C4C /* XCRemoteSwiftPackageReference "Kingfisher" */,
 				7205F9B22AA9B04E008E6C4C /* XCRemoteSwiftPackageReference "Moya" */,
+				72A976292ABC25D40021291C /* XCRemoteSwiftPackageReference "SkeletonView" */,
 			);
 			productRefGroup = 7205F97C2AA99D26008E6C4C /* Products */;
 			projectDirPath = "";
@@ -706,6 +710,14 @@
 				minimumVersion = 15.0.0;
 			};
 		};
+		72A976292ABC25D40021291C /* XCRemoteSwiftPackageReference "SkeletonView" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Juanpe/SkeletonView";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -738,6 +750,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 7205F9B22AA9B04E008E6C4C /* XCRemoteSwiftPackageReference "Moya" */;
 			productName = Moya;
+		};
+		72A9762A2ABC25D40021291C /* SkeletonView */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 72A976292ABC25D40021291C /* XCRemoteSwiftPackageReference "SkeletonView" */;
+			productName = SkeletonView;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

@@ -26,9 +26,9 @@ final class BaseView: UIView, UIConfigurable, KeyboardLayoutProtocol {
     
     init(scene: Scene) {
         collectionView = UICollectionView(frame: .zero, collectionViewLayout: BaseCompositionalLayout.createLayout(scene: scene))
-        
         super.init(frame: .zero)
-        
+        self.isSkeletonable = true
+        collectionView.isSkeletonable = true
         configureViews()
         setAttributes()
         setConstraints()
