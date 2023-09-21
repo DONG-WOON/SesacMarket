@@ -19,6 +19,6 @@ final class SearchItemCell: BaseItemCell {
         titleLabel.text = item.validatedTitle
         priceLabel.text = item.decimalPrice
         wishButton.setImage(UIImage(systemName: !item.isWished ? Image.wish : Image.wishFill), for: .normal)
-        itemImageView.kf.setImage(with: item.originalImageURL)
+        itemImageView.kf.setImage(with: item.originalImageURL, placeholder: UIImage(named: "NoImage"), options: [ .processor(DownsamplingImageProcessor(size: .init(width: 200 * UIScreen.main.scale, height: 200 * UIScreen.main.scale)))])
     }
 }

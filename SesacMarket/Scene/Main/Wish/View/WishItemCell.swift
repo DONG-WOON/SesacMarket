@@ -18,6 +18,6 @@ final class WishItemCell: BaseItemCell {
         titleLabel.text = item.title
         priceLabel.text = item.decimalPrice
         wishButton.setImage(UIImage(systemName: !item.isWished ? Image.wish : Image.wishFill), for: .normal)
-        itemImageView.kf.setImage(with: item.originalImageURL)
+        itemImageView.kf.setImage(with: item.originalImageURL, placeholder: UIImage(named: "NoImage"))
     }
 }

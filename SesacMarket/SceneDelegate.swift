@@ -13,6 +13,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         guard let windowScene = (scene as? UIWindowScene) else { return }
+        
         window = UIWindow(windowScene: windowScene)
         
         let searchVC = SearchViewController(viewModel: SearchViewModel())
@@ -29,7 +30,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             }
             .embedNavigationController()
         
-        let tabBarController = TabBarController(vc: [searchVC, wishVC])
+        let tabBarController = TabBarController(vc: [wishVC, searchVC])
         
         window?.rootViewController = tabBarController
         window?.makeKeyAndVisible()
