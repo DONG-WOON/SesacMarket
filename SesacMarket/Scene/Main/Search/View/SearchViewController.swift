@@ -7,6 +7,7 @@
 
 import UIKit
 import SkeletonView
+import RxSwift
 
 final class SearchViewController: BaseViewController {
     
@@ -36,9 +37,9 @@ final class SearchViewController: BaseViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        let visibleIndexPaths = mainView.collectionView.indexPathsForVisibleItems
+        let visibleIndexPaths = mainView.indexPathsForVisibleItems
         viewModel.checkWishItem(in: visibleIndexPaths) { [weak self] indexPath in
-            self?.mainView.collectionView.reloadItems(at: [indexPath])
+            self?.mainView.reloadItems(at: [indexPath])
         }
     }
     
@@ -58,13 +59,8 @@ final class SearchViewController: BaseViewController {
 
 extension SearchViewController: SortButtonDelegate {
     func sortButtonDidTapped(_ sort: Sort) {
-        viewModel.sort = sort
-        guard !viewModel.items.isEmpty else { return }
-        viewModel.items.removeAll()
-        viewModel.page = 1
-        
-        viewModel.fetchItem() {
-            self.mainView.collectionView.reloadData()
+        viewModel.sortButtonDidTapped(sort: sort) {
+            self.mainView.reloadData()
         } onFailure: { error in
             self.showAlertMessage(title: "검색 실패", message: error.message)
         }
@@ -76,20 +72,17 @@ extension SearchViewController: SortButtonDelegate {
 extension SearchViewController: UISearchBarDelegate {
     
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        viewModel.isLoading = false
-        viewModel.page = 1
-        viewModel.items.removeAll()
-        viewModel.searchString = searchBar.text
         
         mainView.showAnimatedGradientSkeleton()
         
-        viewModel.fetchItem() {
+        viewModel.searchBarButtonDidTapped(searchBar.text) {
             self.mainView.stopSkeletonAnimation()
             self.mainView.hideSkeleton()
 
             if !self.viewModel.items.isEmpty {
                 self.mainView.collectionView.scrollToItem(at: IndexPath(item: 0, section: 0), at: .centeredVertically, animated: true)
             }
+            
         } onFailure: { error in
             self.showAlertMessage(title: "검색 실패", message: error.message)
         }
@@ -179,32 +172,24 @@ extension SearchViewController: UICollectionViewDataSourcePrefetching {
     }
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        if mainView.searchBar.searchTextField.isEditing {
-            mainView.searchBar.endEditing(true)
-        }
+        
+        let collectionView = mainView.collectionView
         
         let offsetY = scrollView.contentOffset.y
-        let collectionView = mainView.collectionView
         let deviceHeight = UIScreen.main.bounds.height
         guard scrollView.frame.size.height > 0 else { return }
         
         guard !viewModel.isLoading else { return }
         
-        if offsetY + scrollView.frame.size.height >= scrollView.contentSize.height - (deviceHeight) {
-            viewModel.isLoading = true
-            guard !viewModel.items.isEmpty else { return }
-           
-            viewModel.page += 1
-            viewModel.fetchItem() {
+        let isOffsetPrefetchable = offsetY + scrollView.frame.size.height >= scrollView.contentSize.height - (deviceHeight)
+        
+        if isOffsetPrefetchable {
+            viewModel.prefetch() {
                 self.viewModel.isLoading = false
                 collectionView.reloadData()
             } onFailure: { error in
                 self.showAlertMessage(title: "검색 실패", message: error.message)
             }
         }
-    }
-
-    func collectionView(_ collectionView: UICollectionView, cancelPrefetchingForItemsAt indexPaths: [IndexPath]) {
-        viewModel.cancelPrefetch(in: indexPaths)
     }
 }

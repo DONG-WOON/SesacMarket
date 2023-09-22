@@ -7,19 +7,25 @@
 
 import UIKit
 import WebKit
+import RealmSwift
+import RxSwift
 
 class DetailViewController: BaseViewController, WKUIDelegate {
-    var webView: WKWebView
+
     let viewModel: DetailViewModel
+    private let disposeBag = DisposeBag()
+    
+    var webView: WKWebView
     lazy var indicator = UIActivityIndicatorView(style: .large)
-   
-    lazy var wishBarButton = UIBarButtonItem(image: UIImage(systemName: Image.wish), style: .plain, target: self, action: #selector(wishButtonDidTapped))
+    lazy var wishBarButton = UIBarButtonItem(image: UIImage(systemName: Image.wish), style: .done, target: self, action: #selector(wishButtonDidTapped))
     
     init(item: Item) {
-        self.viewModel = DetailViewModel(item: item)
+        self.viewModel = DetailViewModel(item: BehaviorSubject(value: item))
         let webConfiguration = WKWebViewConfiguration()
         webView = WKWebView(frame: .zero, configuration: webConfiguration)
         super.init(nibName: nil, bundle: nil)
+        
+        self.navigationItem.title = item.validatedTitle
     }
     
     required init?(coder: NSCoder) {
@@ -28,22 +34,39 @@ class DetailViewController: BaseViewController, WKUIDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        let request = viewModel.requestURL()
-        
+       
         webView.uiDelegate = self
         webView.navigationDelegate = self
         webView.allowsLinkPreview = true
-        webView.load(request)
+        
+        viewModel.requestURL()
+            .take(1)
+            .subscribe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] request in
+                self?.webView.load(request)
+            })
+            .disposed(by: disposeBag)
+        
+        viewModel.item
+            .bind(onNext: { [weak self] item in
+                self?.updateWishButton(isWished: item.isWished)
+                print(#function, item.isWished)
+            })
+            .disposed(by: disposeBag)
+            
+        viewModel.itemIsWished
+            .asSignal(onErrorJustReturn: false)
+            .asObservable()
+            .subscribe(onNext: { [weak self] isWished in
+                self?.updateWishButton(isWished: isWished)
+            })
+            .disposed(by: disposeBag)
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        let isWished = viewModel.isWished()
-        updateWishButton(isWished: isWished)
-        title = viewModel.item.validatedTitle
-//        title = viewModel.item.validatedTitle
+        viewModel.checkItemIsExistInWishItems()
     }
     
     override func configureViews() {
@@ -51,11 +74,8 @@ class DetailViewController: BaseViewController, WKUIDelegate {
         
         view.addSubview(webView)
         view.addSubview(indicator)
-        navigationItem.rightBarButtonItem = wishBarButton
-//        navigationItem.title = viewModel.item.validatedTitle
-        navigationController?.title = viewModel.item.validatedTitle
         
-        updateWishButton(isWished: viewModel.item.isWished)
+        navigationItem.rightBarButtonItem = wishBarButton
     }
     
     override func setConstraints() {
@@ -72,14 +92,13 @@ class DetailViewController: BaseViewController, WKUIDelegate {
     
     @objc func wishButtonDidTapped() {
         do {
-            let isWished = try viewModel.wishButtonAction()
-            updateWishButton(isWished: isWished)
+            try viewModel.toggleWishStatus()
         } catch {
-            showAlertMessage(title: "좋아요 저장 실패", message: (error as? SesacError)?.message)
+            showAlertMessage(title: (error as? SesacError)!.message)
         }
     }
     
-    func updateWishButton(isWished: Bool) {
+    private func updateWishButton(isWished: Bool) {
         wishBarButton.image = UIImage(systemName: isWished ? Image.wishFill : Image.wish)
     }
 }

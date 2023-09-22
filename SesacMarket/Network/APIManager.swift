@@ -14,29 +14,30 @@ struct APIManager {
     private let provider = MoyaProvider<NetworkService>()
     static let shared = APIManager()
     
-    func request(search: String, size: Int = 30, page: Int, sort: Sort, onSuccess: @escaping ([Item]) -> Void, onFailure: @escaping (SesacError) -> Void) -> Cancellable {
+    @discardableResult
+    func request(search: String, size: Int = 30, page: Int, sort: Sort, completion: @escaping (Result<[Item], SesacError>) -> Void) -> Cancellable {
         return provider.request(.search(query: search, size: size, page: page, sort: sort)) { result in
             switch result {
             case .success(let response):
                 do {
                     let data = try response.map(Response.self)
-                    return onSuccess(data.items)
+                    return completion(.success(data.items))
                 } catch {
-                    return onFailure(SesacError.mappingError)
+                    return completion(.failure(SesacError.mappingError))
                 }
             case .failure(let error):
                 guard let statusCode = error.response?.statusCode else {
-                    return onFailure(SesacError.statusCodeIsNil)
+                    return completion(.failure(SesacError.statusCodeIsNil))
                 }
                 switch statusCode {
                 case 400:
-                    return onFailure(SesacError.invalidQuery)
+                    return completion(.failure(SesacError.invalidQuery))
                 case 404:
-                    return onFailure(SesacError.invalidURL)
+                    return completion(.failure(SesacError.invalidURL))
                 case 500:
-                    return onFailure(SesacError.serverError)
+                    return completion(.failure(SesacError.serverError))
                 default:
-                    return onFailure(SesacError.unknown)
+                    return completion(.failure(SesacError.unknown))
                 }
             }
         }

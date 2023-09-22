@@ -24,6 +24,10 @@ final class BaseView: UIView, UIConfigurable, KeyboardLayoutProtocol {
         }
     }
     
+    var indexPathsForVisibleItems: [IndexPath] {
+        return collectionView.indexPathsForVisibleItems
+    }
+    
     init(scene: Scene) {
         collectionView = UICollectionView(frame: .zero, collectionViewLayout: BaseCompositionalLayout.createLayout(scene: scene))
         super.init(frame: .zero)
@@ -36,6 +40,14 @@ final class BaseView: UIView, UIConfigurable, KeyboardLayoutProtocol {
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    func reloadItems(at indexPaths: [IndexPath]) {
+        collectionView.reloadItems(at: indexPaths)
+    }
+    
+    func reloadData() {
+        collectionView.reloadData()
     }
     
     func configureViews() {

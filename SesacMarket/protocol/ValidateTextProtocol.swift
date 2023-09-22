@@ -13,8 +13,9 @@ protocol ValidateTextProtocol {
 
 extension ValidateTextProtocol {
     func validate(text: String?) -> Result<String, SesacError> {
-        guard let text, !text.isEmpty else { return .failure(SesacError.emptyString) }
-        
+        guard let text, !text.isEmpty else {
+            return .failure(SesacError.emptyString)
+        }
         return .success(text)
     }
 }

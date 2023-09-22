@@ -13,7 +13,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         
-        let realmConfiguration = Realm.Configuration(schemaVersion: 1) { migration,oldSchemaVersion in
+        let realmConfiguration = Realm.Configuration(schemaVersion: 2) { migration,oldSchemaVersion in
             
         }
         

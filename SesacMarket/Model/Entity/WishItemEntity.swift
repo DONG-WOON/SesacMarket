@@ -16,7 +16,6 @@ class WishItemEntity: Object, Product {
     @Persisted var price: String
     @Persisted var mallName: String
     @Persisted var maker: String
-    @Persisted var isWished: Bool
     
     var originalImageURL: URL? {
         return URL(string: stringURL)
@@ -31,7 +30,7 @@ class WishItemEntity: Object, Product {
         return price + "원"
     }
     
-    convenience init(productID: String, title: String, stringURL: String, price: String, mallName: String, maker: String, isWished: Bool) {
+    convenience init(productID: String, title: String, stringURL: String, price: String, mallName: String, maker: String) {
         self.init()
         
         self.productID = productID
@@ -40,7 +39,6 @@ class WishItemEntity: Object, Product {
         self.price = price
         self.mallName = mallName
         self.maker = maker
-        self.isWished = isWished
     }
     
     convenience init(domain: Product) {
@@ -53,7 +51,6 @@ class WishItemEntity: Object, Product {
         self.mallName = domain.mallName
         self.productID = domain.productID
         self.maker = domain.maker
-        self.isWished = domain.isWished
     }
     
     func convertToItem() -> Item {

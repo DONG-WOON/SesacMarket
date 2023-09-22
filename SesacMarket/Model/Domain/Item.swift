@@ -47,7 +47,7 @@ struct Item: Codable, Product {
         self.mallName = entity.mallName
         self.productID = entity.productID
         self.maker = entity.maker
-        self.isWished = entity.isWished
+        self.isWished = true
     }
 }
 

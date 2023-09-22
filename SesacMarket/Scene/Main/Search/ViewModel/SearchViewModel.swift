@@ -16,46 +16,35 @@ final class SearchViewModel: ValidateTextProtocol {
     var searchString: String?
     var isLoading = false
     
-    var prefetchingIndexPaths: [IndexPath: Cancelable?] = [:]
-    
-    /*
-     viewModel.sort = sort
-     guard !viewModel.items.isEmpty else { return }
-     viewModel.items.removeAll()
-     viewModel.page = 1
-     */
-    
-    @discardableResult
-    func fetchItem(completion: @escaping () -> Void, onFailure: @escaping (SesacError) -> Void) -> Cancelable? {
+    func fetchItem(onSuccess: @escaping () -> Void, onFailure: @escaping (SesacError) -> Void) {
         let result = validate(text: searchString)
         switch result {
         case .success(let search):
-            return APIManager.shared.request(search: search, page: page, sort: sort)
-            { [weak self] items in
-                guard let self else { return }
-                if items.isEmpty {
-                    onFailure(.invalidQuery)
-                    return
+            APIManager.shared.request(search: search, page: page, sort: sort) { [weak self] result in
+                switch result {
+                case .success(let items):
+                    guard let self else { return }
+                    if items.isEmpty {
+                        onFailure(.invalidQuery)
+                        return
+                    }
+                    
+                    let fetchedItemsLastID = items.last?.productID
+                    let currentItemsLastID = self.items.last?.productID
+                    
+                    if fetchedItemsLastID == currentItemsLastID {
+                        return
+                    }
+                    
+                    self.items.append(contentsOf: items)
+                    
+                    onSuccess()
+                case .failure(let error):
+                    onFailure(error)
                 }
-                if items.last?.productID == self.items.last?.productID {
-                    return
-                }
-                self.items.append(contentsOf: items)
-                completion()
-            } onFailure: { error in
-                onFailure(error)
             }
         case .failure(let error):
             onFailure(error)
-            return nil
-        }
-    }
-    
-    func cancelPrefetch(in indexPaths: [IndexPath]) {
-        if !prefetchingIndexPaths.isEmpty {
-            for indexPath in indexPaths {
-                prefetchingIndexPaths[indexPath]??.cancel()
-            }
         }
     }
     
@@ -64,11 +53,7 @@ final class SearchViewModel: ValidateTextProtocol {
     }
     
     func removeWish(_ item: Item) throws {
-        do {
-            try WishItemEntityRepository.shared.deleteItem(item)
-        } catch {
-            throw SesacError.doNotDelete
-        }
+        try WishItemEntityRepository.shared.deleteItem(item)
     }
     
     func checkWishItem(in indexPaths: [IndexPath], completion: ((IndexPath) -> Void)? = nil) {
@@ -88,17 +73,39 @@ final class SearchViewModel: ValidateTextProtocol {
         let item = items[indexPath.item]
         
         if item.isWished {
-            do {
-                try addWish(item)
-            } catch {
-                throw SesacError.saveError
-            }
+            try addWish(item)
         } else {
-            do {
-                try removeWish(item)
-            } catch {
-                throw SesacError.doNotDelete
-            }
+            try removeWish(item)
         }
+    }
+    
+    func searchBarButtonDidTapped(_ searchText: String?, onSuccess: @escaping () -> Void, onFailure: @escaping (SesacError) -> Void) {
+        
+        isLoading = false
+        reset()
+        searchString = searchText
+        
+        fetchItem(onSuccess: onSuccess, onFailure: onFailure)
+    }
+    
+    func sortButtonDidTapped(sort: Sort, onSuccess: @escaping () -> Void, onFailure: @escaping (SesacError) -> Void) {
+        self.sort = sort
+        guard !items.isEmpty else { return }
+        reset()
+        
+        fetchItem(onSuccess: onSuccess, onFailure: onFailure)
+    }
+    
+    func prefetch(onSuccess: @escaping () -> Void, onFailure: @escaping (SesacError) -> Void) {
+        isLoading = true
+        guard !items.isEmpty else { return }
+       
+        page += 1
+        fetchItem(onSuccess: onSuccess, onFailure: onFailure)
+    }
+    
+    private func reset() {
+        items.removeAll()
+        page = 1
     }
 }
